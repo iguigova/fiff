@@ -49,3 +49,13 @@ test('an unreadable file is reported, not thrown', () => assert.match(run(['miss
 
 test('the command line prints the comparison', () =>
   assert.match(execFileSync('node', [CLI, TEXT, SIMPLE], { encoding: 'utf8' }), /\n2:10 simple \n\n\nTotal number of differences: 1\n$/));
+
+const UNORDERED = { ...DEFAULTS, ordered: false, format: '[{1}:{2}|{3}:{4}]' };
+
+test('unordered: a token absent from the other file is a difference', () =>
+  assert.equal(
+    compare(bytes('This is a complex convoluted text .\n'), bytes('This is convoluted text that my sister wrote.\n'), UNORDERED),
+    total('[8:a |24:that ][10:complex |29:my ][34:.\n|32:sister ][-1:|39:wrote.\n]', 4)));
+
+test('unordered: a token absent from file 1 is a difference even when file 1 goes on matching', () =>
+  assert.equal(compare(bytes('b \n'), bytes('c d b \n'), UNORDERED), total('[-1:|0:c ][-1:|2:d ]', 2)));

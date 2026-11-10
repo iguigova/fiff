@@ -157,13 +157,22 @@ export const compare = (bytes1, bytes2, options = DEFAULTS) => {
     return matched || !ordered ? 0 : Math.min(idx1, idx2) + 1;
   };
 
+  // Unordered: file 1's first token, found anywhere in file 2, leaves with its
+  // match; else file 2's first token, found anywhere in file 1; else both are
+  // a difference.
+  const stepUnordered = (match1, match2) => {
+    if (match2 > UNDEFINED) return step(0, match2, true);
+    if (match1 > UNDEFINED) return step(match1, 0, true);
+    return step(0, 0, false);
+  };
+
   const processAll = () => {
     let idx = 0;
     while (d1.length + d2.length > 0) {
       const match1 = indexOf(d1, peek(d2, idx, 'hash'));
       const match2 = indexOf(d2, peek(d1, idx, 'hash'));
-      if (!ordered && match1 + match2 > idx) {
-        idx = step(step(match1, idx, true), indexOf(d2, peek(d1, idx, 'hash')), true);
+      if (!ordered) {
+        idx = stepUnordered(match1, match2);
       } else {
         const idx1 = match1 > UNDEFINED && match2 === UNDEFINED ? match1 : idx;
         const idx2 = match2 > UNDEFINED && match1 === UNDEFINED ? match2 : idx;

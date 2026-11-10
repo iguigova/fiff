@@ -33,8 +33,17 @@ failing case through the code:
 
 | Cause | Lines | Failing cases |
 |---|---|---|
-| Unordered mode removes a token as matched when its lookup found nothing: the second `Process` call passes `matched = true` whatever `IndexOf` returned, so "a" vanishes from the differences. | 135–138 | 31 |
+| Unordered mode removes a token as matched when its lookup found nothing: both `Process` calls pass `matched = true` whatever `IndexOf` returned, so "a" vanishes from the differences. | 135–138 | 31 |
 | When the two windows each hold the other's current token at different places, the whole window is reported as one difference instead of syncing on the nearer match, so a swapped word pair is 4 tokens where 2 do. | 142–145 | 10, 12 |
 | When either file ends, the difference is reported in the same pass that reads the other file's remaining tokens, before they are searched for a match, so a shared line end is reported as changed. | 90–91, 107–119 | 5, 7 |
 | An empty side's position is read from its empty token list, which answers -1. | 73–74 | 1, 6, 21, 26, 31 |
 | A difference ends at the first token both windows share, and a line repeated through the file, such as `<TR vAlign=top>`, ends it early, so the competition test reports 25 lines where 19 do. This is the algorithm, not a slip in the code. | 128–147 | 35 |
+
+## What the port fixes
+
+The port answers as the original does wherever the original passes every
+check, and fixes these causes at their source in `src/fiff.js`:
+
+- Unordered mode takes one token a step: file 1's first token, found anywhere
+  in file 2, leaves with its match; else file 2's first token, found anywhere
+  in file 1; else both are a difference.

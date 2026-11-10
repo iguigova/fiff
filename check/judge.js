@@ -19,7 +19,7 @@ export const args = c => [path(c.file1), path(c.file2), String(c.delimiter), Str
 
 export const recorded = (c, i) => readFileSync(new URL(`../record/csharp/${i}.out`, import.meta.url), 'utf8');
 
-const load = (c, output) => ({ ...c, ...parse(output), bytes1: readFileSync(path(c.file1)), bytes2: readFileSync(path(c.file2)) });
+export const load = (c, output) => ({ ...c, ...parse(output), bytes1: readFileSync(path(c.file1)), bytes2: readFileSync(path(c.file2)) });
 
 export const judge = (label, outputOf) => cases.forEach((c, i) => {
   const run = load(c, outputOf(c, i));
