@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "record": "csharp/record.sh",
-    "test": "FIFF_OUT=record/csharp FIFF_FILES=original/test node --test --experimental-test-coverage check/*.test.js"
+    "test": "node --test --experimental-test-coverage check/*.test.js src/*.test.js",
+    "original": "node --test --experimental-test-coverage check/original.js"
   }
 }

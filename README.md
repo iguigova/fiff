@@ -5,17 +5,21 @@ by token until a token of one is found among the other's, and its check
 against a reference diff.
 
 - `original/` is FIFFConsole 0.2 in C#, unchanged, from the `FIFFConsole`
-  branch of `snippets_cs` at `e9d8cb1b69053e98e4a873d4712e49757ea0e481`: its source, documentation and
-  test files.
+  branch of `snippets_cs` at `e9d8cb1`: its source, documentation and test
+  files.
 - `csharp/record.sh` builds it on .NET 8 in Docker and runs it on every case
   in `check/cases.js`, writing `record/csharp/<case>.out`.
-- `check/` judges each recorded result: the differences counted match those
-  listed; each sits in its file where it says; in ordered mode, removing them
-  leaves the same text in both files, and they hold no more tokens than the
-  smallest diff, by longest common subsequence; in unordered mode, each side
-  reports exactly its tokens absent from the other file.
+- `src/fiff.js` is the JS port, for Node and the browser, with no
+  dependencies; `src/cli.js` takes FIFFConsole's arguments. On every case it
+  reports the differences the original reports.
+- `check/` judges a result: the differences counted match those listed; each
+  sits in its file where it says; in ordered mode, removing them leaves the
+  same text in both files, and they hold no more tokens than the smallest
+  diff, by longest common subsequence; in unordered mode, each side reports
+  exactly its tokens absent from the other file.
 
-`npm test` runs the checks on the record, and the checker's own tests.
+`npm test` runs the port against the record, the port's own tests and the
+checker's. `npm run original` runs the checks on the record.
 
 The cases are those of `original/test/TestHarness.bat` whose files the branch
 holds, under the five argument sets of `FIFFConsoleTestHarness.bat`, and the
@@ -23,9 +27,9 @@ competition test on `grid1.html` and `grid2.html`.
 
 ## What the checks find in the original
 
-Eleven of the 144 tests fail. Each failure traces to one of five causes, all
-in `original/src/FIFFBroker.cs`, confirmed by tracing each failing case
-through the code:
+`npm run original` fails 11 of its 130 tests. Each failure traces to one of
+five causes, all in `original/src/FIFFBroker.cs`, confirmed by tracing each
+failing case through the code:
 
 | Cause | Lines | Failing cases |
 |---|---|---|
