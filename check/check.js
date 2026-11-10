@@ -63,7 +63,7 @@ export const minimal = run => {
   return reported === smallest ? [] : [`differences hold ${reported} tokens, the smallest diff ${smallest}`];
 };
 
-// Unordered: each side reports exactly its tokens absent from the other file.
+// Unordered: each side reports exactly the tokens the other file lacks.
 export const exact = run => {
   const [k1, k2] = [keys(run.bytes1, run.delimiter), keys(run.bytes2, run.delimiter)];
   return [

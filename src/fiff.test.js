@@ -72,3 +72,8 @@ test('ordered: at the end of a file the shared line end is no difference', () =>
 
 test('unordered: a side with nothing left stands at the end of its file', () =>
   assert.equal(compare(bytes('This is a text \n'), bytes('This is a simple text \n'), UNORDERED), total('[16:|10:simple ]', 1)));
+
+test('unordered: each token cancels one copy, so repeats count and order does not', () => {
+  assert.equal(compare(bytes('b b b \n'), bytes('b \n'), UNORDERED), total('[2:b |3:][4:b |3:]', 2));
+  assert.equal(compare(bytes('a b a \n'), bytes('b a a \n'), UNORDERED), total('', 0));
+});

@@ -14,9 +14,10 @@ against a reference diff.
 - `check/` judges a result. A correct answer counts as many differences as
   it lists, and each sits in its file where it says; in ordered mode,
   removing them leaves the same text in both files; in unordered mode, each
-  side reports exactly its tokens absent from the other file. Its size is the
-  tokens the differences hold, against the smallest diff by longest common
-  subsequence.
+  side reports exactly the tokens the other file lacks, each token
+  cancelling one copy on the other side, so order does not matter and
+  repeats count. Its size is the tokens the differences hold, against the
+  smallest diff by longest common subsequence.
 
 `npm test` runs the checks on the port's answers, holds them to no larger
 than the original's in ordered mode and to the original's wherever the

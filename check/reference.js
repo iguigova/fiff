@@ -1,5 +1,6 @@
 // The reference answers: the smallest ordered diff, by longest common
-// subsequence, and the unordered rule of FIFF 0.2.
+// subsequence, and the unordered rule of FIFF 0.2: the same tokens in any
+// order.
 
 const nextRow = (a, prev, y) => {
   const row = [0];
@@ -12,5 +13,14 @@ export const lcsLength = (a, b) => b.reduce((prev, y) => nextRow(a, prev, y), Ar
 // Tokens deleted plus tokens inserted, in the smallest diff.
 export const minimalEdit = (a, b) => a.length + b.length - 2 * lcsLength(a, b);
 
-// A token present anywhere in the other file is not a difference.
-export const absent = (a, b) => { const other = new Set(b); return a.filter(t => !other.has(t)); };
+// The tokens of `a` the other side lacks: each token of `b` cancels one copy,
+// so order does not matter and repeats count.
+export const absent = (a, b) => {
+  const left = new Map();
+  b.forEach(t => left.set(t, (left.get(t) ?? 0) + 1));
+  return a.filter(t => {
+    const n = left.get(t) ?? 0;
+    left.set(t, n - 1);
+    return n <= 0;
+  });
+};

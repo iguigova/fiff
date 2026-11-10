@@ -25,8 +25,11 @@ test('the LCS of two token lists', () => assert.equal(lcsLength(['a', 'b', 'c', 
 
 test('the smallest edit counts deletions and insertions', () => assert.equal(minimalEdit(['a', 'b'], ['a', 'c']), 2));
 
-test('absent keeps the tokens the other list lacks, with repeats', () =>
-  assert.deepEqual(absent(['a', 'b', 'b'], ['a']), ['b', 'b']));
+test('absent keeps the tokens the other list lacks, each copy cancelling one', () => {
+  assert.deepEqual(absent(['a', 'b', 'b'], ['a']), ['b', 'b']);
+  assert.deepEqual(absent(['b', 'b', 'b'], ['b']), ['b', 'b']);
+  assert.deepEqual(absent(['a', 'b', 'a'], ['b', 'a', 'a']), []);
+});
 
 test('the parser reads the sentinel format back exactly', () => {
   const out = SENTINEL_FORMAT.replace('{1}', '3').replace('{2}', 'x\ny').replace('{3}', '-1').replace('{4}', '');
@@ -66,3 +69,6 @@ test('the runner list has one tab-separated line per case, by index', async () =
   assert.equal(lines.length, cases.length);
   assert.equal(lines[35], '35\tgrid1.html\tgrid2.html\t13\ttrue\t200');
 });
+
+test('unordered: repeats count, so a missing copy is caught', () =>
+  assert.equal(verdicts(run('b b b \n', 'b \n', [{ pos1: 2, text1: 'b ', pos2: 3, text2: '' }], false)).exact, false));
