@@ -51,3 +51,6 @@ check, and fixes these causes at their source in `src/fiff.js`:
   difference at the nearer of the two matches.
 - Ordered mode, at the end of a file, reports the rest only once every token
   has been looked for in the other side.
+- A side with no tokens left in a difference gives as its position how far
+  its file has been read: in ordered mode where the other side's text goes,
+  in unordered mode the end of the file.

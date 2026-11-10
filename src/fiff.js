@@ -127,14 +127,18 @@ export const compare = (bytes1, bytes2, options = DEFAULTS) => {
     return text;
   };
 
+  // Where a side's difference starts: its first token, or, with none left,
+  // as far as its file has been read.
+  const position = (s, data) => (data.length > 0 ? data[0].pos : s.next);
+
   const reindex = idx => (ordered ? idx : 0);
 
   const reposition = (s, pos) => (ordered ? pos : last(s));
 
   // Reports file 1's tokens 0..idx1 against file 2's tokens 0..idx2.
   const report = (idx1, idx2) => {
-    const pos1 = peek(d1, 0, 'pos');
-    const pos2 = peek(d2, 0, 'pos');
+    const pos1 = position(s1, d1);
+    const pos2 = position(s2, d2);
     const offset = peek(d1, idx1, 'hash') === peek(d2, idx2, 'hash') ? -1 : 0;
     const diff1 = readOut(s1, d1, reindex(idx1 + offset), reposition(s1, peekEnd(d1, idx1)));
     const diff2 = readOut(s2, d2, reindex(idx2 + offset), reposition(s2, peekEnd(d2, idx2)));

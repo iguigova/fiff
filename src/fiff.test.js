@@ -55,10 +55,10 @@ const UNORDERED = { ...DEFAULTS, ordered: false, format: '[{1}:{2}|{3}:{4}]' };
 test('unordered: a token absent from the other file is a difference', () =>
   assert.equal(
     compare(bytes('This is a complex convoluted text .\n'), bytes('This is convoluted text that my sister wrote.\n'), UNORDERED),
-    total('[8:a |24:that ][10:complex |29:my ][34:.\n|32:sister ][-1:|39:wrote.\n]', 4)));
+    total('[8:a |24:that ][10:complex |29:my ][34:.\n|32:sister ][36:|39:wrote.\n]', 4)));
 
 test('unordered: a token absent from file 1 is a difference even when file 1 goes on matching', () =>
-  assert.equal(compare(bytes('b \n'), bytes('c d b \n'), UNORDERED), total('[-1:|0:c ][-1:|2:d ]', 2)));
+  assert.equal(compare(bytes('b \n'), bytes('c d b \n'), UNORDERED), total('[3:|0:c ][3:|2:d ]', 2)));
 
 const ORDERED = { ...DEFAULTS, format: '[{1}:{2}|{3}:{4}]' };
 
@@ -69,3 +69,6 @@ test('ordered: at the end of a file the shared line end is no difference', () =>
   assert.equal(compare(bytes('This is a text \n'), bytes('This is a text simple \n'), ORDERED), total('[15:|15:simple ]', 1));
   assert.equal(compare(bytes('a b c \n'), bytes('a \n'), ORDERED), total('[2:b c |2:]', 1));
 });
+
+test('unordered: a side with nothing left stands at the end of its file', () =>
+  assert.equal(compare(bytes('This is a text \n'), bytes('This is a simple text \n'), UNORDERED), total('[16:|10:simple ]', 1)));
