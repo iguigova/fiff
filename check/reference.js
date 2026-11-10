@@ -17,10 +17,12 @@ export const minimalEdit = (a, b) => a.length + b.length - 2 * lcsLength(a, b);
 // so order does not matter and repeats count.
 export const absent = (a, b) => {
   const left = new Map();
-  b.forEach(t => left.set(t, (left.get(t) ?? 0) + 1));
-  return a.filter(t => {
+  for (const t of b) left.set(t, (left.get(t) ?? 0) + 1);
+  const lacking = [];
+  for (const t of a) {
     const n = left.get(t) ?? 0;
-    left.set(t, n - 1);
-    return n <= 0;
-  });
+    if (n > 0) left.set(t, n - 1);
+    else lacking.push(t);
+  }
+  return lacking;
 };
