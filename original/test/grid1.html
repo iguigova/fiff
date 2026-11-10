@@ -1,0 +1,1784 @@
+ 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Article Source</title>
+<link rel="stylesheet" type="text/css" href="http://www.codeproject.com/App_Themes/NetCommunity/CodeProject.css" />
+<base href="http://www.codeproject.com/KB/miscctrl/" />
+</head>
+<body>
+<!--
+HTML for article "MFC Grid control 2.26" by Chris Maunder
+URL: http://localhost/KB/miscctrl/gridctrl.aspx
+Copyright 1999 by Chris Maunder
+All formatting, additions and alterations Copyright © CodeProject, 1999-2009
+-->
+ 
+ 
+ 
+<p><b>Please choose 'View Source' in your browser to view the HTML, or File | Save to save this 
+file to your hard drive for editing.</b></p>
+ 
+<hr class="Divider subdue" />
+<div>
+ 
+ 
+ 
+ 
+<!-- Start Article -->
+<span id="ArticleContent">
+<UL class=download>
+<LI class=download><A href="gridctrl/gridctrl_demo226.zip">Download demo project 
+(v2.26 beta) - 296 Kb</A> 
+<LI class=download><A href="gridctrl/gridctrl226_src.zip">Download source (v2.26 
+beta) - 101 Kb</A><BR>&nbsp; 
+<LI class=download><A href="gridctrl/gridctrl_demo225.zip">Download demo project 
+(v2.25) - 278 Kb</A> 
+<LI class=download><A href="gridctrl/gridctrl_src.zip">Download source (v2.25) - 
+99 Kb</A> </LI></UL>
+<P><IMG height=228 alt="gridctrl example image" src="gridctrl/gridctrl.gif" 
+width=341 align=bottom border=0> 
+<H2>Preface</H2>
+<P>This grid is the work of thousands of hours of squinting at pixels, hunting 
+memory leaks, adding new features, fixing new bugs and beating the code by force 
+of will into a form that is as feature rich and useable as something of this 
+form can be. Dozens of developers from all over the world have contributed 
+fixes, improvements and suggestions over the 4 years that the grid has been 
+growing, and there is still no end in sight. Most of the fixes have been sent in 
+by readers so I'm trusting that they have done sufficient testing.</P>
+<P>Release 2.26 is a minor update of 2.25 for Visual C++ 8.0 (Visual Studio 
+2005) and includes row and column reordering as well as sorting in virtual 
+mode.For a full list of changes for version 2.26 click <A href="#New">here</A>. 
+Please note that the changes in 2.26 are considered beta quality and have not 
+been tested. Version 2.25 has is still available for download above.</P>
+<H2>Contents</H2>
+<TABLE cellSpacing=0 cellPadding=0 width="90%">
+<TBODY>
+<TR>
+<TD vAlign=top>
+<UL>
+<LI><A href="#Introduction">Introduction</A> 
+<LI><A href="#Structure">Structure</A> 
+<LI><A href="#Overrides">Protected overridable functions</A> 
+<LI><A href="#Clipboard">Clipboard</A> 
+<LI><A href="#Sorting">Sorting</A> 
+<LI><A href="#Virtual">Virtual Mode</A> 
+<LI><A href="#Acknowledgements">Acknowledgements</A> </LI></UL></TD>
+<TD vAlign=top>
+<UL>
+<LI><A href="#Appearance">General appearance and features</A> 
+<LI><A href="#Files">Files</A> 
+<LI><A href="#Constuction">Construction</A> 
+<LI><A href="#NumRowsCols">Number of rows and columns</A> 
+<LI><A href="#Sizing">Sizing and position functions</A> 
+<LI><A href="#reorder">Reordering rows and columns</A></LI></UL></TD>
+<TD vAlign=top>
+<UL>
+<LI><A href="#EditValidate">Cell Editing and Validation</A> 
+<LI><A href="#Structures">Structures, defines and Messages</A> 
+<LI><A href="#Colours">Colours</A> 
+<LI><A href="#CellInfo">General cell information</A> 
+<LI><A href="#Operations">Operations</A> 
+<LI><A href="#Printing">Printing</A> 
+<LI><A href="#History">History</A> </LI></UL></TD></TR></TBODY></TABLE>
+<H2><A name=Introduction>Introduction</A></H2>
+<P>After pushing the <CODE>CListCtrl</CODE> to its limits in trying to display 
+and edit tabulated data I decided what was really needed was a dedicated grid 
+control. I started writing my own grid control from scratch but decided to save 
+time by modifying <A href="mailto:chinajoe@aol.com">Joe Willcoxson's</A> free 
+WorldCom grid control at <A 
+href="http://users.aol.com/chinajoe/wcmfclib.html">http://users.aol.com/chinajoe/wcmfclib.html</A>. 
+I tore apart his code and rebuilt it from the ground up in order to get it to do 
+all the things I needed. The code has gone through so many modifications that 
+I'm not sure if there is even a single original line of code. In any case Joe's 
+code was a great framework on which to build. 
+<P>The project started out as a simple clean up but very quickly ballooned into 
+a bit of a nightmare as I kept finding new features that I felt just <I>had</I> 
+to go into it. It has not been tested exhaustively - but I'm fairly confident 
+that it won't fall over too badly :). Joe was kind enough to allow me to release 
+the source with no strings attached (since it is based on his code) but since 
+the project was such a marathon I am placing a couple of very minor conditions 
+on the use of this code: 
+<BLOCKQUOTE style="BACKGROUND-COLOR: #fbedbb"><I>
+<P>This code may be used in compiled form in any way you desire (including 
+commercial use). The code may be redistributed unmodified by any means 
+<B>providing</B> it is not sold for profit without the authors written consent, 
+and providing that this notice and the authors name and all copyright notices 
+remains intact. However, this file and the accompanying source code <B>may 
+not</B> be hosted on a website or bulletin board without the authors written 
+permission.</P>
+<P><B>This software is provided "as is" without express or implied warranty. Use 
+it at your own risk!</B></P>
+<P>Whilst I have made every effort to remove any undesirable "features", I 
+cannot be held responsible if it causes any damage or loss of time or 
+data.</P></I></BLOCKQUOTE>Hopefully that isn't too much to ask considering the 
+amount of work that went into this. If you <I>do</I> use it in a commercial 
+application then <B>please</B> send me an <A 
+href="mailto:cmaunder@mail.com">email</A> letting me know. There's no point in 
+me releasing and maintaining/upgrading this thing if no one is gonna use it. 
+<P>The control features: 
+<UL>
+<LI>Cell selection using the mouse, with optional Control and Shift key 
+combinations. Selection can be disabled. 
+<LI>Row and Column resizing. Sizing can be disabled for row, columns or both. 
+<LI>Auto row or column sizing when dividers are double-clicked. 
+<LI>Any number of fixed rows and columns. 
+<LI>Individual cells can have separate text and background colours. 
+<LI>Individual cells can have separate fonts. 
+<LI>Individual cells can be marked "Read-Only", or have their modification 
+status set and checked. 
+<LI>OLE Drag and drop. 
+<LI>Ctrl-C, Ctrl-X and Ctrl-V perform clipboard copy, cut and paste, and Ctrl-A 
+for "Select All" 
+<LI>In place editing of cell contents. If a character key is pressed while a 
+cell has focus, editing will start on that cell, and the arrow keys will allow 
+navigation to other keys. If the current focus cell is clicked on, editing will 
+start and the arrow keys will move the carat inside the edit control. Editing 
+can be disabled. 
+<LI>Support for Microsoft intellimouse. 
+<LI>Optional grid lines. 
+<LI>Images in any cell 
+<LI>"Virtual" mode for large datasets 
+<LI>Full printing support, for either a Doc/View environment (inc Print preview) 
+or a standalone dialog based app (no print preview). 
+<LI>Optional "List mode", including full row selection, single row selection, 
+and sort on column header click. 
+<LI>Numerous virtual functions to allow this control to be extended very easily. 
+ 
+<LI>Unicode support. 
+<LI>WinCE support 
+<LI>Titletips for cells that are too small to display their data. 
+<LI>Hidden rows and columns 
+<LI>Compiles under VC 4.2, 5.0, 6.0 and under the CE toolkit version 2.0 and 3.0 
+</LI></UL>The sample project demonstrates most of the features of the grid 
+control. 
+<H2><A name=Files>Files</A></H2>
+<P>To use the Grid control in your project you will need to add a number of 
+files to your project: <BR><BR>
+<BLOCKQUOTE>
+<TABLE cellSpacing=0 width="90%">
+<TBODY>
+<TR vAlign=top>
+<TD><CODE>gridctrl.cpp, gridctrl.h</CODE></TD>
+<TD>Main grid control source and header files.</TD></TR>
+<TR>
+<TD><CODE>gridcellbase.cpp, gridcellbase.h</CODE></TD>
+<TD>Main grid cell base class.</TD></TR>
+<TR>
+<TD><CODE>gridcell.cpp, gridcell.h</CODE></TD>
+<TD>Main grid cell default class implementation.</TD></TR>
+<TR vAlign=top>
+<TD><CODE>CellRange.h</CODE></TD>
+<TD>Definition of CCellID and CCellRange helper classes.</TD></TR>
+<TR vAlign=top>
+<TD><CODE>MemDC.h</CODE></TD>
+<TD><A href="keithr@europa.com">Keith Rule</A>'s memory DC helper 
+class.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>InPlaceEdit.cpp, InPlaceEdit.h</CODE></TD>
+<TD>In-place edit windows source and header files.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>GridDropTarget.cpp, GridDropTarget.h</CODE></TD>
+<TD>Grid control OLE drag and drop target. Only necessary if you don't define 
+GRIDCONTROL_NO_DRAGDROP in gridctrl.h</TD></TR>
+<TR vAlign=top>
+<TD width="45%"><CODE>Titletip.cpp, Titletip.h</CODE></TD>
+<TD width="50%">Titletips for cells, from Zafir Anjum. Only necessary if you 
+don't define GRIDCONTROL_NO_TITLETIPS in 
+gridctrl.h</TD></TR></TBODY></TABLE></BLOCKQUOTE><A name=Structure></A>
+<H2>Structure</H2>
+<P>The grid is based on a framework (the <CODE>CGridCtrl</CODE> object) that 
+organises and controls a collection of cells (<CODE>CGridBaseCell</CODE>) that 
+contain the data, perform operations such as drawing, and handle methods such as 
+button clicks. The grid object itself handles events such as button clicks 
+before the cells get a chance, and will pass on certain mouse messages if it 
+considers it necessary. The grid also contains a drag and drop target 
+(<CODE>CGridDropTarget</CODE>) that is registered to handle drop notifications, 
+and there is also a title tip object (<CODE>CTitleTip</CODE>) that displays the 
+contents of cells when the physical dimensions of a cell are insufficient to 
+display its' contents in their entirety. 
+<P>The grid cells can be of any type as long as the class is derived from 
+<CODE>CGridBaseCell</CODE>. Included with the package is a 
+<CODE>CGridCell</CODE> class that handles basic data storage and editing. 
+Extensions such as the <CODE>CGridCellCombo</CODE> and <CODE>CGridURLCell</CODE> 
+class demonstrate how to create your own cell classes. 
+<P>There are two main types of cell - fixed and non-fixed. Fixed cells are 
+typically on the left and top of the grid and do not move when the grid is 
+scrolled. Typically these contain column and row headings and are not editable. 
+Non fixed cells make up the "interior" of the grid and can be edited and 
+selected. 
+<P>Default values for various properties of the grid are stored in 
+<CODE>CGridDefaultCell</CODE> objects. There are currently 4 of these objects 
+per grid - one each to hold default values for the non-fixed cells, fixed 
+columns, foxed rows, and cells that are both fixed rows and columns cells. Thus 
+in order to set a default property for the grid, use 
+<CODE>CGridCtrL::GetDefaultCell</CODE> to get the default cell implementation 
+you are after, then set it's values directly. 
+<P>Cells hold their property values explicitely, except for the font property. 
+Each cell holds a pointer to a font structure, and this pointer is only 
+allocated and used if you set that cell's font to a non-default value. 
+<P>The grid also has a <B>virtual mode</B> that stops the grid from actually 
+creating cells, and allows you to specify either a callback funtion or message 
+handler that the grid will call each time it needs information on a cell. This 
+saves enourmously on memory at the expense of slightly decreased performance. 
+There is a <CODE>GVN_ODCACHEHINT</CODE> message that is sent to the grid's 
+parent that will help you cache data in preparation for the grid's cell info 
+requests. 
+<P>Grid cells are stored row-by-row, so all operations on large numbers of cells 
+should be done row-by-row as well. 
+<H2><A name=Constuction>Construction</A></H2>
+<P>OK - so how do you use it? 
+<P>The underlying class of the grid control is <CODE>CGridCtrl</CODE> which is 
+derived from <CODE>CWnd</CODE>. To use it, either use the MS Visual C++ dialog 
+editor to place a custom control on a dialog, and enter "MFCGridCtrl" (no 
+quotes) as the Class name. To subclass the control using the <CODE>DDX</CODE> 
+mechanism (this will be done by default by the ClassWizard) use the 
+<CODE>DDX_GridControl</CODE> function instead of the <CODE>DDX_Control</CODE> 
+function (just manually change the ClassWizard entry). This ensures your control 
+is correctly registered as a drop target and avoids some weird win95 issues. 
+<P>Alternatively you can use <CODE>CGridCtrl::Create</CODE>: </P><PRE>CGridCtrl grid;
+grid.Create(rect, pParentWnd, nID);</PRE>where <I>rect</I> is the dimensions, 
+<B>pParentWnd</B> is the parent window, and <I>nID</I> is the id. 
+<H2><A name=NumRowsCols>Number of rows and columns</A></H2>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetRowCount() const</CODE> </TD>
+<TD class=smallText width="100%">Returns the number of rows (including fixed 
+rows)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetColumnCount() const</CODE> </TD>
+<TD class=smallText width="100%">Returns the number of columns (including fixed 
+columns)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetFixedRowCount() const</CODE> </TD>
+<TD class=smallText vAlign=top width="100%">Returns the number of fixed 
+rows</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetFixedColumnCount() const</CODE> </TD>
+<TD class=smallText width="100%">Returns the number of fixed columns</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetRowCount(int nRows)</CODE> </TD>
+<TD class=smallText width="100%">Sets the number of rows (including fixed rows), 
+Returning TRUE on success.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetColumnCount(int nCols)</CODE> </TD>
+<TD class=smallText width="100%">Sets the number of columns (including fixed 
+columns), Returning TRUE on success.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetFixedRowCount(int nFixedRows = 1)</CODE> </TD>
+<TD class=smallText width="100%">Sets the number of fixed rows, returning TRUE 
+on success.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetFixedColumnCount(int nFixedCols = 1)</CODE> </TD>
+<TD class=smallText width="100%">Sets the number of columns, returning TRUE on 
+success.</TD></TR></TBODY></TABLE>
+<H2><A name=Sizing>Sizing and position functions</A></H2>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetRowHeight(int nRow) const</CODE> </TD>
+<TD class=smallText width="100%">Gets the height of row nRow.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetRowHeight(int row, int height)</CODE> </TD>
+<TD class=smallText width="100%">Sets the height of row nRow.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetColumnWidth(int nCol) const</CODE> </TD>
+<TD class=smallText width="100%">Gets the width of column nCol</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetColumnWidth(int col, int width)</CODE> </TD>
+<TD class=smallText width="100%">Sets the width of column nCol.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetFixedRowHeight() const</CODE> </TD>
+<TD class=smallText width="100%">Gets the combined height of the fixed 
+rows.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetFixedColumnWidth() const</CODE> </TD>
+<TD class=smallText width="100%">Gets the combined width of the fixed 
+columns.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>long GetVirtualHeight() const</CODE> </TD>
+<TD class=smallText width="100%">Gets the combined height of all the 
+rows.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>long GetVirtualWidth() const</CODE> </TD>
+<TD class=smallText width="100%">Gets the combined width of all the 
+columns.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetCellOrigin(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPPOINT p)</CODE> </TD>
+<TD class=smallText width="100%">Gets the topleft point for cell (nRow,nCol), 
+returning TRUE if successful. (cell must be visible for success).</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetCellOrigin(const CCellID&amp; 
+cell,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPPOINT p)</CODE> </TD>
+<TD class=smallText width="100%">Gets the topleft point for the given cell, 
+returning TRUE if successful. (cell must be visible for success). See also <A 
+href="#CCellID">CCellID</A><A>.</A></TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetCellRect(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPRECT pRect)</CODE> </TD>
+<TD class=smallText width="100%">Gets the bounding rectangle for the given cell, 
+returning TRUE if successful. (cell must be visible for success).</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetCellRect(const CCellID&amp; 
+cell,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPRECT pRect)</CODE> </TD>
+<TD class=smallText width="100%">Gets the bounding rectangle for the given cell, 
+returning TRUE if successful. (cell must be visible for success). See also <A 
+href="#CCellID">CCellID</A><A>.</A></TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetTextRect(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPRECT pRect)t</CODE> </TD>
+<TD class=smallText width="100%">Gets the bounding rectangle for the text in the 
+given cell, returning TRUE if successful. (cell must be visible for 
+success).</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetTextRect(const CCellID&amp; 
+cell,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPRECT pRect)</CODE> </TD>
+<TD class=smallText width="100%">Gets the bounding rectangle for the text in the 
+given cell, returning TRUE if successful. (cell must be visible for success). 
+See also <A href="#CCellID">CCellID</A><A>.</A></TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetTextExtent(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPCTSTR str)</CODE> </TD>
+<TD class=smallText width="100%">Gets the bounding rectangle for the given text 
+for the given cell, returning TRUE if successful.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetCellTextExtent(int nRow, int nCol)</CODE> </TD>
+<TD class=smallText width="100%">Gets the bounding rectangle for the text in the 
+given cell, returning TRUE if successful.</TD></TR></TBODY></TABLE>
+<H2><A name=reorder>Reordering Rows and Columns</A></H2>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR>
+<TD vAlign=top noWrap><CODE>void Reorder(int From, int To);</CODE></TD>
+<TD>Reorders a row 'From' to row 'To'</TD></TR>
+<TR>
+<TD vAlign=top noWrap><CODE>void AllowReorderColumn(bool b=true) </CODE></TD>
+<TD>Whether or not columns can be reordered</TD></TR>
+<TR>
+<TD vAlign=top noWrap><CODE>void EnableDragRowMode(bool b=true) </CODE></TD>
+<TD>Whether or not rows can be reordered via drag and drop</TD></TR>
+<TR>
+<TD vAlign=top noWrap><CODE>int GetLayer(int** pLayer)</CODE> </TD>
+<TD>Returns a pointer to an array of ints representing the current ordering of 
+the grid. Do not forget to delete *pLayer when you are finished</TD></TR>
+<TR>
+<TD vAlign=top noWrap><CODE>void SetLayer(int* pLayer)</CODE></TD>
+<TD>Sets the ordering of the grid based on a previous saved 
+state.</TD></TR></TBODY></TABLE>
+<P>
+<H2><A name=Virtual>Virtual Mode</H2></A>
+<P>Virtual mode allows you to use the grid to display large amounts of data 
+without requiring the grid to actually store this data. In Virtual Mode, no 
+cells are created and no data is stored other than the widths and heights of 
+columns and rows. 
+<P>Since the data is not stored by the grid, the grid must have some way of 
+asking the application to supply it with data. This is done either by either 
+registering a callback function with the grid, or by having the parent handle a 
+<CODE>GVN_GETDISPINFO</CODE> notification.</P>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetVirtualMode(BOOL bVirtual)</CODE></TD>
+<TD class=smallText width="100%">Places the grid in or out of virtual 
+mode.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetVirtualMode()</CODE></TD>
+<TD class=smallText width="100%">Returns TRUE if the grid is in virtual 
+mode.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetCallbackFunc(GRIDCALLBACK 
+pCallback,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPARAM lParam) </CODE></TD>
+<TD class=smallText width="100%">Sets the callback function for when the grid is 
+in virtual mode.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>GRIDCALLBACK GetCallbackFunc() </CODE></TD>
+<TD class=smallText width="100%">Returns the callback function when the grid is 
+in virtual mode.</TD></TR></TBODY></TABLE>
+<P>If no callback function is specified then the grid will send a 
+<CODE>GVN_GETDISPINFO</CODE> message to it's parent. A <CODE>GV_DISPINFO</CODE> 
+structure part of this notification, and looks like:</P><PRE>typedef struct tagGV_DISPINFO {
+    NMHDR   hdr;
+    GV_ITEM item;
+} GV_DISPINFO;</PRE>
+<P>Obviously it's nice to have a hint as to what sort of data the grid will be 
+asking for in order to allow caching, so the grid sends out a 
+<CODE>GVN_ODCACHEHINT</CODE> message before displaying a page of cells. A 
+<CODE>GV_CACHEHINT</CODE> structure is sent as part of this message and looks 
+like:</P><PRE>typedef struct tagGV_CACHEHINT {
+    NMHDR      hdr;
+    CCellRange range;
+} GV_CACHEHINT;</PRE>
+<P>An example of handling these messages is as follows: </P><PRE>// m_Grid is a member variable of a dialog class that is handling
+// this message
+BOOL CGridCtrlDemoDlg::OnNotify(WPARAM wParam, LPARAM lParam, 
+                                LRESULT* pResult) 
+{
+    if (wParam == (WPARAM)m_Grid.GetDlgCtrlID())
+    {
+        *pResult = 1;
+        GV_DISPINFO *pDispInfo = (GV_DISPINFO*)lParam;
+        if (GVN_GETDISPINFO == pDispInfo-&gt;hdr.code)
+        {
+            //TRACE2("Getting Display info for cell %d,%d\n", 
+                     pDispInfo-&gt;item.row, pDispInfo-&gt;item.col);
+            pDispInfo-&gt;item.strText.Format(_T("Message %d,%d"),
+                     pDispInfo-&gt;item.row, pDispInfo-&gt;item.col);
+            return TRUE;
+        }
+        else if (GVN_ODCACHEHINT == pDispInfo-&gt;hdr.code)
+        {
+            GV_CACHEHINT *pCacheHint = (GV_CACHEHINT*)pDispInfo;
+            TRACE(_T("Cache hint received for cell range %d,%d - %d,%d\n"),
+                  pCacheHint-&gt;range.GetMinRow(), 
+                  pCacheHint-&gt;range.GetMinCol(),
+                  pCacheHint-&gt;range.GetMaxRow(), 
+                  pCacheHint-&gt;range.GetMaxCol());
+        }
+    }
+    
+	return CDialog::OnNotify(wParam, lParam, pResult);
+}</PRE>
+<P>You can use <CODE>SetCallbackFunc</CODE> to set a callback function that the 
+grid will call directly instead of sending a <CODE>GVN_GETDISPINFO</CODE> 
+message. A <CODE>GVN_ODCACHEHINT</CODE> message will still be send if a callback 
+is used. 
+<P>The callback function should be of the form: </P><PRE>BOOL CALLBACK CallbackFunction(GV_DISPINFO * pDispInfo, LPARAM lParam);</PRE>
+<P>For example: </P><PRE>BOOL CALLBACK CGridCtrlDemoDlg::GridCallback(GV_DISPINFO *pDispInfo, 
+                                             LPARAM /*lParam*/) 
+{
+    pDispInfo-&gt;item.strText.Format(_T("Callback %d,%d"),
+                          pDispInfo-&gt;item.row, pDispInfo-&gt;item.col);
+    return TRUE;
+}</PRE>
+<P>When calling <CODE>SetCallbackFunc</CODE> you can specify an 
+<CODE>LPARAM</CODE> value that will be passed to the callback function each time 
+it is called. Note that the callback function must be a static or global 
+function. 
+<H2><A name=Appearance>General appearance and features</A></H2>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetImageList(CImageList* pList)</CODE> </TD>
+<TD class=smallText width="100%">Sets the current image list for the grid. The 
+control only takes a copy of the pointer to the image list, not a copy of the 
+list itself.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>CImageList* GetImageList()</CODE> </TD>
+<TD class=smallText width="100%">Gets the current image list for the 
+grid.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetGridLines(int nWhichLines = GVL_BOTH)</CODE> </TD>
+<TD class=smallText width="100%">Sets which (if any) gridlines are displayed. 
+See <A href="#GVL_Values">here</A> for possible values.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetGridLines() </CODE></TD>
+<TD class=smallText width="100%">Gets which (if any) gridlines are displayed. 
+See <A href="#GVL_Values">here</A> for possible return values.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetEditable(BOOL bEditable = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets if the grid is editable.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsEditable()</CODE> </TD>
+<TD class=smallText width="100%">Gets whether or not the grid is 
+editable.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetListMode(BOOL bEnableListMode = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets the grid into (or out of) List mode. When 
+the grid is in list mode, full row selection is enabled and clicking on the 
+column header will sort the grid by rows.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetListMode()</CODE> </TD>
+<TD class=smallText width="100%">Get whether or not the grid is in list 
+mode.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetSingleRowSelection(BOOL bSing = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets the grid into (or out of) Single row 
+selection mode. This mode is only effective when in ListMode. When in this mode, 
+only a single row at a time can be selected, so the grid behaves somewhat like a 
+multicolumn listbox.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetSingleRowSelection()</CODE> </TD>
+<TD class=smallText width="100%">Get whether or not the grid is in single row 
+selection mode.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetSingleColSelection(BOOL bSing = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets the grid into (or out of) Single column 
+selection mode. When in this mode, only a single column at a time can be 
+selected.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetSingleColSelection()</CODE> </TD>
+<TD class=smallText width="100%">Get whether or not the grid is in single column 
+selection mode.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnableSelection(BOOL bEnable = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets whether or not the grid cells can be 
+selected.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsSelectable()</CODE> </TD>
+<TD class=smallText width="100%">Get whether or not grid cells are 
+selectable.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetFixedRowSelection(BOOL bSelect)</CODE> </TD>
+<TD class=smallText width="100%">Set whether or not clicking on a fixed row 
+selects the cells next to it.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetFixedRowSelection()</CODE> </TD>
+<TD class=smallText width="100%">Get whether or not clicking on a fixed row 
+selects the cells next to it.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetFixedColumnSelection(BOOL bSelect)</CODE> </TD>
+<TD class=smallText width="100%">Set whether or not clicking on a fixed column 
+selects the cells underneath.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetFixedColumnSelection()</CODE> </TD>
+<TD class=smallText width="100%">Get whether or not clicking on a fixed column 
+selects the cells underneath.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnableDragAndDrop(BOOL bAllow = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets whether drag and drop is 
+enabled.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetDragAndDrop()</CODE> </TD>
+<TD class=smallText width="100%">Get whether drag and drop is allowed.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetRowResize(BOOL bResize = TRUE) </CODE></TD>
+<TD class=smallText width="100%">Sets whether or not rows can be 
+resized.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetRowResize()</CODE> </TD>
+<TD class=smallText width="100%">Gets whether or not rows can be 
+resized.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetColumnResize(BOOL bResize = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets whether or not columns can be 
+resized.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetColumnResize()</CODE> </TD>
+<TD class=smallText width="100%">Gets whether or not columns can be 
+resized.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetHandleTabKey(BOOL bHandleTab = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets whether or not the TAB key is used to move 
+the cell selection.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetHandleTabKey()</CODE> </TD>
+<TD class=smallText width="100%">Gets whether or not the TAB key is used to move 
+the cell selection.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetDoubleBuffering(BOOL bBuffer = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets whether or not double buffering is used 
+when painting (avoids flicker).</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetDoubleBuffering()</CODE> </TD>
+<TD class=smallText width="100%">Gets whether or not double buffering is used 
+when painting.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnableTitleTips(BOOL bEnable = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Sets whether or not titletips are 
+used.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetTitleTips()</CODE></TD>
+<TD class=smallText width="100%">Gets whether or not titletips are 
+used.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetTrackFocusCell(BOOL bTrack)</CODE></TD>
+<TD class=smallText width="100%">Sets whether or not the fixed cells on the same 
+row/column as the current focus cell are highlighted with a sunken 
+border</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetTrackFocusCell()</CODE></TD>
+<TD class=smallText width="100%">Gets whether or not the fixed cells on the same 
+row/column as the current focus cell are highlighted with a sunken 
+border</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetFrameFocusCell(BOOL bFrame)</CODE></TD>
+<TD class=smallText width="100%">Sets whether or not the cell with the focus is 
+highlighted with a framed border</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetFrameFocusCell()</CODE></TD>
+<TD class=smallText width="100%">Gets whether or not the focus cell is 
+highlighted with a framed border</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetAutoSizeStyle(int nStyle = GVS_BOTH)</CODE></TD>
+<TD class=smallText width="100%">Sets how the auto-sizing should be performed. 
+GVS_BOTH = use fixed and non fixed cells; GVS_HEADER = use only the fixed cells; 
+GVS_DATA = use only non-fixed cells. </TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetAutoSizeStyle()</CODE></TD>
+<TD class=smallText width="100%">Gets how the auto-sizing should be 
+performed</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnableHiddenColUnhide(BOOL bEnable = TRUE)</CODE></TD>
+<TD class=smallText width="100%">Sets whether or not hidden (0-width) columns 
+can be unhidden by the user resizing the column.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetHiddenColUnhide()</CODE></TD>
+<TD class=smallText width="100%">Gets whether or not hidden (0-width) columns 
+can be unhidden by the user resizing the column.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnableHiddenRowUnhide(BOOL bEnable = TRUE)</CODE></TD>
+<TD class=smallText width="100%">Sets whether or not hidden (0-height) rows can 
+be unhidden by the user resizing the row.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetHiddenRowUnhide()</CODE></TD>
+<TD class=smallText width="100%">Gets whether or not hidden (0-height) rows can 
+be unhidden by the user resizing the row.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnableColumnHide(BOOL bEnable = TRUE)</CODE></TD>
+<TD class=smallText width="100%">Sets whether or columns can be contracted to 0 
+width via mouse.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetColumnHide()</CODE></TD>
+<TD class=smallText width="100%">Gets whether or not columns can be contracted 
+to 0 width via mouse.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnableRowHide(BOOL bEnable = TRUE)</CODE></TD>
+<TD class=smallText width="100%">Sets whether or not rows can be contracted to 0 
+height via mouse.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetRowHide()</CODE></TD>
+<TD class=smallText width="100%">ets whether or not rows can be contracted to 0 
+height via mouse.</TD></TR></TBODY></TABLE>
+<H2><A name=Colours>Colours</A></H2>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetGridBkColor(COLORREF clr)</CODE> </TD>
+<TD class=smallText width="100%">Sets the background colour of the control (the 
+area outside fixed and non-fixed cells).</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetGridBkColor() </CODE></TD>
+<TD class=smallText width="100%">Gets the background colour of the 
+control.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetGridLineColor(COLORREF clr)</CODE></TD>
+<TD class=smallText width="100%">Sets the colour of the gridlines.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetGridLineColor() </CODE></TD>
+<TD class=smallText width="100%">Gets the colour of the grid lines.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetTitleTipBackClr() </CODE></TD>
+<TD class=smallText width="100%">Gets the background colour of the 
+titletips.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetTitleTipBackClr(COLORREF clr = CLR_DEFAULT)</CODE></TD>
+<TD class=smallText width="100%">Sets the background colour of the 
+titletips.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetTitleTipTextClr() </CODE></TD>
+<TD class=smallText width="100%">Gets the text colour of the 
+titletips.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetTitleTipTextClr(COLORREF clr = CLR_DEFAULT)</CODE></TD>
+<TD class=smallText width="100%">Sets the text colour of the 
+titletips.</TD></TR></TBODY></TABLE>
+<P><B>The following functions are no longer supported.</B> You should use 
+<CODE>GetDefaultCell</CODE> to get the default cell implementation for the cell 
+type you are intererested in, then set that cell's properties directly. If a 
+given cell has default values set, then it will use the values in the default 
+cell implementation that matches that cell type.</P>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetTextColor(COLORREF clr)</CODE> </TD>
+<TD class=smallText width="100%">Sets the colour of the text in non-fixed 
+cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetTextColor()</CODE> </TD>
+<TD class=smallText width="100%">Gets the colour of the text in non-fixed 
+cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetTextBkColor(COLORREF clr)</CODE> </TD>
+<TD class=smallText width="100%">Sets the background colour of the non-fixed 
+cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetTextBkColor() </CODE></TD>
+<TD class=smallText width="100%">Gets the background colour of the non-fixed 
+cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetFixedTextColor(COLORREF clr)</CODE> </TD>
+<TD class=smallText width="100%">Sets the colour of the text in fixed 
+cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetFixedTextColor()</CODE> </TD>
+<TD class=smallText width="100%">Gets the colour of the text in fixed 
+cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetFixedBkColor(COLORREF clr)</CODE> </TD>
+<TD class=smallText width="100%">Sets the background colour of the fixed 
+cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetFixedBkColor() </CODE></TD>
+<TD class=smallText width="100%">Gets the background colour of the fixed 
+cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetBkColor(COLORREF clr)</CODE> </TD>
+<TD class=smallText width="100%">Sets the background colour of the control (the 
+area outside fixed and non-fixed cells).</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetBkColor() </CODE></TD>
+<TD class=smallText width="100%">Gets the background colour of the 
+control.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetGridColor(COLORREF clr)</CODE></TD>
+<TD class=smallText width="100%">Sets the colour of the gridlines.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetGridColor() </CODE></TD>
+<TD class=smallText width="100%">Gets the colour of the grid 
+lines.</TD></TR></TBODY></TABLE>
+<P>See also the <A href="#CellColours">Individual Cell colour functions</A> that 
+allow an individual cell's colours to be changes seperate to the rest of the 
+grid. 
+<H2><A name=CellInfo>General cell information</A></H2>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>CGridCellBase* GetDefaultCell(BOOL 
+bFixedRow,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+BOOL bFixedCol) const</CODE></TD>
+<TD class=smallText width="100%">Gets a pointer to the default cell 
+implementation for the desired cell type. <I>bFixedRow</I> and <I>bFixedCol</I> 
+specify whether the cell is fixed (in row, column or both) or unfixed. Use this 
+to set default properties for the grid. Actual cells in the grid have their 
+values set as default values when they are first created. They will use 
+<CODE>GetDefaultCell</CODE> to query the grids default cell properties and use 
+these values for drawing themselves.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>CGridCellBase* GetCell(int nRow, int nCol) const</CODE></TD>
+<TD class=smallText width="100%">Gets the actual cell for the given row/column 
+(or NULL on failure)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetCellType(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+CRuntimeClass* pRuntimeClass);</CODE></TD>
+<TD class=smallText width="100%">Sets the cell class type.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetDefaultCellType(CRuntimeClass* 
+pRuntimeClass);</CODE></TD>
+<TD class=smallText width="100%">Sets the default cell class type for new 
+cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetModified(BOOL bModified = 
+TRUE,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+int nRow = -1, int nCol = -1)</CODE> </TD>
+<TD class=smallText width="100%">Sets the modified flag for a cell. If no row or 
+columns is specified, then change affects the entire grid.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetModified(int nRow = -1, int nCol = -1)</CODE> </TD>
+<TD class=smallText width="100%">Sets the modified flag for a cell, or if no 
+cell, it returns the status for the entire grid.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsCellFixed(int nRow, int nCol)</CODE> </TD>
+<TD class=smallText width="100%">Returns TRUE if the cell is a fixed 
+cell.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsItemEditing(int nRow, int nCol)</CODE> </TD>
+<TD class=smallText width="100%">Returns TRUE if the cell is currently being 
+edited.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetItem(const GV_ITEM* pItem)</CODE></TD>
+<TD class=smallText width="100%">Sets the contents of a cell with the values 
+from the <A href="#GV_ITEM">GV_ITEM</A> structure. Note that the value of the 
+mask field will determine which values are actually changed (cf. 
+CListCtrl::SetItem).</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetItem(GV_ITEM* pItem)</CODE></TD>
+<TD class=smallText width="100%">Fills the <A href="#GV_ITEM">GV_ITEM</A> 
+structure with values from the specified cell. Note that the value of the mask 
+field will determine which values are actually retrieved (cf. 
+CListCtrl::GetItem). </TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetItemText(int nRow, int nCol, LPCTSTR str)</CODE></TD>
+<TD class=smallText width="100%">Sets the text for the given cell. Returns TRUE 
+on success</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>virtual CString GetItemText(int nRow, int nCol)</CODE> </TD>
+<TD class=smallText width="100%">Gets the text for the given cell. This function 
+is virtual in order to aid extensibility. No more messing around with 
+LVN_GETDISPINFO messages or string pooling!</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetItemData(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPARAM lParam)</CODE> </TD>
+<TD class=smallText width="100%">Sets the lParam (user-defined data) field for 
+the given cell. Returns TRUE on success. See also <A 
+href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>LPARAM GetItemData(int nRow, int nCol) const</CODE> </TD>
+<TD class=smallText width="100%">Gets the lParam (user-defined data) field for 
+the given cell. See also <A href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetItemImage(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+int iImage)</CODE> </TD>
+<TD class=smallText width="100%">Sets the image index for the given cell. 
+Returns TRUE on success. See also <A href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetItemImage(int nRow, int nCol) const</CODE> </TD>
+<TD class=smallText width="100%">Gets the image index for the given 
+cell.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetItemState(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+UINT state)</CODE> </TD>
+<TD class=smallText width="100%">Sets the state of the given cell. Returns TRUE 
+on success. See also <A href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>UINT GetItemState(int nRow, int nCol) const</CODE> </TD>
+<TD class=smallText width="100%">Gets the state of the given cell. See also <A 
+href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetItemFormat(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+UINT nFormat)</CODE> </TD>
+<TD class=smallText width="100%">Sets the format of the given cell. Returns TRUE 
+on success. Default implementation of cell drawing uses CDC::DrawText, so any of 
+the DT_* formats are available. See also <A 
+href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>UINT GetItemFormat(int nRow, int nCol) const</CODE> </TD>
+<TD class=smallText width="100%">Gets the format of the given cell (default 
+returns a CDC::DrawText DT_* format). See also <A 
+href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetSelectedCount()</CODE> </TD>
+<TD class=smallText width="100%">Gets the number of selected cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>CCellID GetFocusCell()</CODE></TD>
+<TD class=smallText width="100%">Gets the cell with the focus. See also <A 
+href="#CCellID">CCellID</A><A>.</A></TD></TR>
+<TR>
+<TD noWrap><CODE>CCellID SetFocusCell(CCellID cell);<BR>CCellID SetFocusCell(int 
+nRow, int nCol);</CODE> </TD>
+<TD class=smallText width="100%">Sets the cell with the focus</TD></TR><A 
+name=CellColours></A>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetItemBkColour(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+COLORREF cr = CLR_DEFAULT)</CODE></TD>
+<TD class=smallText width="100%">Sets the background colour of the given cell. 
+Returns TRUE on success. See also <A href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetItemBkColour(int nRow, int nCol) const</CODE></TD>
+<TD class=smallText width="100%">Gets the background colour of the given cell. 
+See also <A href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetItemFgColour(int nRow, int 
+nCol,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+COLORREF cr = CLR_DEFAULT)</CODE></TD>
+<TD class=smallText width="100%">Sets the foreground colour of the given cell. 
+Returns TRUE on success. See also <A href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>COLORREF GetItemFgColour(int nRow, int nCol) const</CODE></TD>
+<TD class=smallText width="100%">Gets the foreground colour of the given cell. 
+See also <A href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL SetItemFont(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LOGFONT* lf)</CODE></TD>
+<TD class=smallText width="100%">Sets the font of the given cell. Returns TRUE 
+on success. See also <A href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR>
+<TD noWrap><CODE>LOGFONT* GetItemFont(int nRow, int nCol) const</CODE> </TD>
+<TD class=smallText width="100%">Gets the font of the given cell. See also <A 
+href="#GV_ITEM">GV_ITEM</A>.</TD></TR>
+<TR>
+<TD noWrap><CODE>BOOL IsItemEditing(int nRow, int nCol)</CODE></TD>
+<TD class=smallText width="100%">Returns TRUE if the cell is currently being 
+edited.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnsureVisible(CCellID &amp;cell)</CODE></TD>
+<TD class=smallText width="100%">Ensures that the specified cell is 
+visible.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsCellVisible(CCellID &amp;cell) const<BR>BOOL 
+IsCellVisible(CCellID cell) const</CODE></TD>
+<TD class=smallText width="100%">Returns TRUE if the cell is visible.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsCellEditable(CCellID &amp;cell) const<BR>BOOL 
+IsCellEditable(CCellID cell) const</CODE></TD>
+<TD class=smallText width="100%">Returns TRUE if the cell is editable.</TD></TR>
+<TR>
+<TD noWrap><CODE>BOOL IsCellSelected(CCellID &amp;cell) const<BR>BOOL 
+IsCellSelected(CCellID cell) const</CODE></TD>
+<TD class=smallText width="100%">Returns TRUE if the cell is selected</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnsureVisible(int nRow, int nCol)</CODE></TD>
+<TD class=smallText width="100%">Ensures that the specified cell is 
+visible.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsCellFixed(int nRow, int nCol)</CODE> </TD>
+<TD class=smallText width="100%">Returns TRUE if the given cell is a fixed 
+cell</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetDefCellHeight() const</CODE> </TD>
+<TD class=smallText width="100%">Returns the default cell height (for new 
+cells)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetDefCellHeight(int nHeight)</CODE> </TD>
+<TD class=smallText width="100%">Sets the default cell height (for new cells). 
+This will be overridden if <CODE>SetFont</CODE> is called</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetDefCellWidth() const</CODE> </TD>
+<TD class=smallText width="100%">Returns the default cell width (for new 
+cells)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetDefCellWidth(int nWidth)</CODE> </TD>
+<TD class=smallText width="100%">Sets the default cell width (for new cells). 
+This will be overridden if <CODE>SetFont</CODE> is called</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int GetDefCellWidth() const</CODE> </TD>
+<TD class=smallText width="100%">Returns the default cell internal 
+margin</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetDefCellMargin(int nMargin)</CODE> </TD>
+<TD class=smallText width="100%">Sets the default cell internal 
+margin.</TD></TR></TBODY></TABLE>
+<H2><A name=Operations>Operations</A></H2>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>int InsertColumn(LPCTSTR strHeading, 
+&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+UINT nFormat, int nColumn = -1)</CODE></TD>
+<TD class=smallText width="100%">Inserts a column at the position given by nCol, 
+or at the end of all columns if nCol is &lt; 0. <B>strHeading</B> is the column 
+heading and <B>nFormat</B> the format. Returns the position of the inserted 
+column.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>int InsertRow(LPCTSTR 
+strHeading,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+int nRow = -1)</CODE> </TD>
+<TD class=smallText width="100%">Inserts a row at the position given by nRow, or 
+at the end of all rows if nRow is &lt; 0. <B>strHeading</B> is the row heading. 
+The format of each cell in the row will be that of the cell in the first row of 
+the same column. Returns the position of the inserted row.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL DeleteColumn(int nColumn)</CODE> </TD>
+<TD class=smallText width="100%">Deletes column "nColumn", return TRUE on 
+success.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL DeleteRow(int nRow)</CODE> </TD>
+<TD class=smallText width="100%">Deletes row "nRow", return TRUE on 
+success.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL DeleteAllItems()</CODE> </TD>
+<TD class=smallText width="100%">Deletes all rows and contents in the 
+grid.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL DeleteNonFixedRows()</CODE> </TD>
+<TD class=smallText width="100%">Deletes all non-fixed rows in the 
+grid.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL AutoSizeRow(int nRow, BOOL bResetScroll=TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Auto sizes the row to the size of the largest 
+item. If <I>bResetScroll</I> is TRUE then the scroll bars will be 
+reset.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL AutoSizeColumn(int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UINT nAutoSizeStyle = 
+GVS_DEFAULT,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BOOL 
+bResetScroll = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Auto sizes the column to the size of the 
+largest item. <I>nAutoSizeStyle</I> sets the way the autosize will occur (see <A 
+href="#AutosizeOption">AutoSizing options</A>). If <I>bResetScroll</I> is TRUE 
+then the scroll bars will be reset.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void AutoSizeRows()</CODE> </TD>
+<TD class=smallText width="100%">Auto sizes all rows.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void AutoSizeColumns(UINT nAutoSizeStyle=GVS_DEFAULT)</CODE> 
+</TD>
+<TD class=smallText width="100%">Auto sizes all columns. <I>nAutoSizeStyle</I> 
+sets the way the autosize will occur. (see <A href="#AutosizeOption">AutoSizing 
+options</A>) </TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void AutoSize(UINT nAutoSizeStyle = GVS_DEFAULT)</CODE> </TD>
+<TD class=smallText width="100%">Auto sizes all rows and columns. 
+<I>nAutoSizeStyle</I> sets the way the autosize will occur. (see <A 
+href="#AutosizeOption">AutoSizing options</A>)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void ExpandColumnsToFit(BOOL bExpandFixed=TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Expands the column widths to fit the grid area. 
+If <I>bExpandFixed</I> is TRUE then fixed columns will be modified, otherwise 
+they will not be affected.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void ExpandLastColumn()</CODE> </TD>
+<TD class=smallText width="100%">Expands the last column width to fill any 
+remaining grid area.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void ExpandRowsToFit(BOOL bExpandFixed=TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Expands the row heights to fit the grid area. 
+If <I>bExpandFixed</I> is TRUE then fixed rows will be modified, otherwise they 
+will not be affected.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void ExpandToFit(BOOL bExpandFixed = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Expands the rows and columns to fit the grid 
+area. If <I>bExpandFixed</I> is TRUE then fixed cells will be modified, 
+otherwise they will not be affected.&lt;</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>CSize GetTextExtent(int nRow, int nCol, LPCTSTR str)</CODE> 
+</TD>
+<TD class=smallText width="100%">Gets the size of the text pointed to by str for 
+the given cell </TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>CSize GetCellTextExtent(int nRow, int nCol)</CODE> </TD>
+<TD class=smallText width="100%">Gets the size of the text of the given cell 
+</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetRedraw(BOOL bAllowDraw, 
+&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+BOOL bResetScrollBars = FALSE)</CODE> </TD>
+<TD class=smallText width="100%">Stops/starts redraws on things like changing 
+the number of rows and columns and autosizing, but not for user-intervention 
+such as resizes.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL RedrawCell(int nRow, int 
+nCol,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+CDC* pDC = NULL)</CODE> </TD>
+<TD class=smallText width="100%">Redraws the given cell. Drawing will be via the 
+pDC if one is supplied.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL RedrawCell(const CCellID&amp; 
+cell,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+CDC* pDC = NULL)</CODE> </TD>
+<TD class=smallText width="100%">Redraws the given cell. Drawing will be via the 
+pDC if one is supplied.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL RedrawRow(int row)</CODE> </TD>
+<TD class=smallText width="100%">Redraws the given row.</TD></TR>
+<TR>
+<TD noWrap><CODE>BOOL RedrawColumn(int col)</CODE> </TD>
+<TD class=smallText width="100%">Redraws the given column</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL Refresh()</CODE> </TD>
+<TD class=smallText width="100%">Redraws the entire grid.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>CCellRange GetCellRange()</CODE> </TD>
+<TD class=smallText width="100%">Gets the range of cells for the entire grid. 
+See also <A href="#CCellRange">CCellRange</A><A>.</A></TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetSelectedRange(const CCellRange&amp; 
+Range,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+&nbsp; BOOL bForceRepaint = FALSE);</CODE> </TD>
+<TD class=smallText width="100%">Sets the range of selected cells. See also <A 
+href="#CCellRange">CCellRange</A><A>.</A></TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetSelectedRange(int nMinRow, int 
+nMinCol,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+&nbsp; int nMaxRow, int 
+nMaxCol,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+&nbsp; BOOL bForceRepaint = FALSE);</CODE> </TD>
+<TD class=smallText width="100%">Sets the range of selected cells.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsValid(int nRow, int nCol)</CODE> </TD>
+<TD class=smallText width="100%">Returns TRUE if the given row and column is 
+valid.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsValid(const CCellID&amp; cell)</CODE> </TD>
+<TD class=smallText width="100%">Returns TRUE if the given cell is 
+valid.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL IsValid(const CCellRange&amp; range)</CODE> </TD>
+<TD class=smallText width="100%">Returns TRUE if the given cell range is 
+valid.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>CCellID GetNextItem(CCellID&amp; cell, int 
+nFlags)<BR>&nbsp;const</CODE> </TD>
+<TD class=smallText width="100%">Searches for a cell that has the specified 
+properties and that bears the specified relationship to a given item. (See also 
+CListCtrl::GetNextItem and <A href="#CellSearch">Cell Searching 
+options</A>)</TD></TR></TBODY></TABLE>
+<H2><A name=Sorting>Sorting</A></H2>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>void SetHeaderSort(BOOL bSortOnClick = TRUE)</CODE> 
+</TD>
+<TD class=smallText width="100%">Sets whether or not rows are sorted on column 
+header clicks in ListMode.</TD></TR>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>BOOL GetHeaderSort()</CODE> </TD>
+<TD class=smallText width="100%">Gets whether or not rows are sorted on column 
+header clicks in ListMode.</TD></TR>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>SetSortColumn(int nCol</CODE></TD>
+<TD class=smallText width="100%">Sets the index of the currently sorted 
+column.</TD></TR>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>int GetSortColumn()</CODE></TD>
+<TD class=smallText width="100%">Gets the index of the currently sorted 
+column.</TD></TR>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>void SetSortAscending(BOOL bAscending)</CODE></TD>
+<TD class=smallText width="100%">Sets whether the current sort column is sorted 
+ascending.</TD></TR>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>BOOL GetSortAscending()</CODE></TD>
+<TD class=smallText width="100%">Gets whether the current sort column is sorted 
+ascending.</TD></TR>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>BOOL SortTextItems(int nCol, BOOL 
+bAscending,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPARAM data = 0)</CODE> </TD>
+<TD class=smallText width="100%">Sorts the grid on the given column based on 
+cell text. Returns TRUE on success.</TD></TR>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>BOOL SortItems(int nCol, BOOL 
+bAscending,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LPARAM data = 0)</CODE> </TD>
+<TD class=smallText width="100%">Sorts the grid on the given column based using 
+the current comparison function. If no function has been specified then the rows 
+are sorted by text. Returns TRUE on success. <BR>See also 
+SetCompareFunction()</TD></TR>
+<TR>
+<TD noWrap width="50%"><CODE>void SetCompareFunction(PFNLVCOMPARE 
+pfnCompare)</CODE> </TD>
+<TD class=smallText width="100%">Sets the callback function that will be used to 
+sort the grid rows. See below for more details.</TD></TR>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>void SetVirtualCompare(PVIRTUALCOMPARE 
+VirtualCompare)</CODE></TD>
+<TD class=smallText width="100%">Sets the callback function that will be used to 
+sort the grid rows in virtual mode. See below for more details.</TD></TR>
+<TR vAlign=top>
+<TD noWrap width="50%"><CODE>BOOL SortItems(PFNLVCOMPARE pfnCompare, int 
+nCol,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+BOOL bAscending, LPARAM data = 0)</CODE> </TD>
+<TD class=smallText width="100%">Sorts the grid on the given column using the 
+supplied compare function pfnCompare. See CListCtrl::SortItems for information 
+in the form of this function. Returns TRUE on success.</TD></TR></TBODY></TABLE>
+<P>Sorting is achieved by calling one of the variants of <CODE>SortItems</CODE>, 
+<CODE>SortTextItems</CODE>, or by the user clicking on a column header when in 
+list mode.&nbsp; 
+<P>The simplest way to handle sorting is to set the function that will be used 
+in cell comparisons (by calling <CODE>SetCompareFunction</CODE> and/or 
+<CODE>SetVirtualCompare</CODE>) and then calling <CODE>SortItems(int nCol, BOOL 
+bAscending, LPARAM data = 0)</CODE>. <I>nCol</I> is the column to sort, 
+<EM>bAscending</EM> sets whether the sort is in ascending or descending order, 
+and <I>data</I> is application specific data that will be passed to the 
+comparison function. 
+<P>The comparison function must be a global or static function with the form 
+</P><PRE>int CALLBACK pfnCellCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)</PRE>
+<P><I>lParam1</I> and <I>lParam2</I> will be <CODE>CGridCellBase</CODE> 
+pointers, and <I>lParamSort</I> will be the application specific data you pass 
+into the <CODE>SortItems</CODE> function as the <I>data</I> parameter. The 
+function must return -1 if the first cell contains a value less than the second 
+cell; 0 if they are equal, otherwise 1. 
+<P>An example of a sort comparison function is as follows: </P><PRE>int CALLBACK MyClass::pfnCellNumericCompare(LPARAM lParam1,
+                                            LPARAM lParam2, 
+                                            LPARAM lParamSort)
+{
+	CGridCellBase* pCell1 = (CGridCellBase*) lParam1;
+	CGridCellBase* pCell2 = (CGridCellBase*) lParam2;
+	if (!pCell1 || !pCell2) return 0;
+ 
+	int nValue1 = _ttol(pCell1-&gt;GetText());
+	int nValue2 = _ttol(pCell2-&gt;GetText());
+ 
+	if (nValue1 &lt; nValue2)
+		return -1;
+	else if (nValue1 == nValue2)
+		return 0;
+	else
+		return 1;
+}</PRE>
+<P>Two functions have been provided for your convenience: </P><PRE>int CALLBACK CGridCtrl::pfnCellTextCompare(LPARAM lParam1, 
+                                           LPARAM lParam2, 
+                                           LPARAM lParamSort)
+int CALLBACK CGridCtrl::pfnCellNumericCompare(LPARAM lParam1, 
+                                              LPARAM lParam2, 
+                                              LPARAM lParamSort)</PRE>
+<P>These sort by Text value and by numeric value (using <CODE>itoa</CODE> 
+respectively. To set the comparison function for the grid simply call: </P><PRE>m_Grid.SetCompareFunction(CGridCtrl::pfnCellNumericCompare);</PRE>
+<P>If the comparison function is set as NULL, 
+<CODE>CGridCtrl::pfnCellTextCompare</CODE> will be used by default. 
+<P>Sorting in Virtual mode requires you provide a function with the signature 
+<CODE>bool (*PVIRTUALCOMPARE)(int, int);</CODE> to the function 
+<CODE>SetVirtualCompare</CODE>. Needless to say this function will have to be 
+optimised if you are trying to sort large amounts of data. 
+<H2><A name=Printing>Printing</A></H2>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>void EnableWysiwygPrinting(BOOL bEnable = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">Set WYSIWYG Printing </TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetWysiwygPrinting()</CODE> </TD>
+<TD class=smallText width="100%">Returns TRUE if WYSIWYG Printing is 
+set</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void Print()</CODE> </TD>
+<TD class=smallText width="100%">Prints the grid control on the user selected 
+device. (Useful where the control is used in a dialog)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>virtual void OnBeginPrinting(CDC 
+*pDC,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+CPrintInfo *pInfo)</CODE> </TD>
+<TD class=smallText width="100%">Used in a Doc/View environment. Call in your 
+CView dervied class' OnBeginPrinting.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>virtual void OnPrint(CDC *pDC, CPrintInfo *pInfo)</CODE> </TD>
+<TD class=smallText width="100%">Used in a Doc/View environment. Call in your 
+CView dervied class' OnPrint.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>virtual void OnEndPrinting(CDC 
+*pDC,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+CPrintInfo *pInfo)</CODE> </TD>
+<TD class=smallText width="100%">Used in a Doc/View environment. Call in your 
+CView dervied class' OnEndPrinting.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetShadedPrintOut(BOOL bEnable = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">If TRUE, colored cells will print as-is. If 
+FALSE, all text prints as black on white.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>BOOL GetShadedPrintOut()</CODE> </TD>
+<TD class=smallText width="100%">Get's whether or not cells are printed shaded 
+or as-is.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void SetPrintMarginInfo(int 
+nHeaderHeight,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int nFooterHeight, 
+int nLeftMargin,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int nRightMargin, 
+int nTopMargin,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int nBottomMargin, 
+int nGap)</CODE></TD>
+<TD class=smallText width="100%">Set printing margin info.</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>void GetPrintMarginInfo(int 
+&amp;nHeaderHeight,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int 
+&amp;nFooterHeight, int 
+&amp;nLeftMargin,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int 
+&amp;nRightMargin, int 
+&amp;nTopMargin,&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int 
+&amp;nBottomMargin, int &amp;nGap)</CODE> </TD>
+<TD class=smallText width="100%">Get printing margin 
+info.</TD></TR></TBODY></TABLE>
+<H2><A name=Structures>Structures, defines and Messages</A></H2>
+<H3>The CGridCellBase class</H3>
+<P>This class is the base class for all grid cell classes, and holds the 
+information for each cell. The class also defines a number of methods that are 
+called by the grid itself, such as drawing and printing. Almost all methods and 
+functions are virtual and this class is not designed to be used directly - 
+rather it should be derived from. The default class <CODE>CGridCell</CODE> is 
+derived from <CODE>CGridCellBase</CODE> and is used by the Grid control as the 
+default cell class.</P>
+<H4>Attributes</H4><PRE>virtual void SetText(LPCTSTR szText);
+virtual void SetImage(int nImage);
+virtual void SetData(LPARAM lParam);
+virtual void SetState(DWORD nState);
+virtual void SetFormat(DWORD nFormat);
+virtual void SetTextClr(COLORREF clr);
+virtual void SetBackClr(COLORREF clr);
+virtual void SetFont(const LOGFONT* plf);
+virtual void SetGrid(CGridCtrl* pGrid);
+virtual void SetCoords(int nRow, int nColumn);
+virtual void SetMargin(UINT nMargin);
+ 
+virtual LPCTSTR  GetText() const         // returns the text in the cell
+virtual LPCTSTR  GetTipText() const      // return alternate tooltip text 
+                                         // if you wish 
+virtual int      GetImage() const        // returns image index for cell
+virtual LPARAM   GetData() const         // returns data associated with cell
+virtual DWORD    GetState() const        // returns cell state
+virtual DWORD    GetFormat() const       // returns cell format
+virtual COLORREF GetTextClr() const      // returns cell text color
+virtual COLORREF GetBackClr() const      // returns cell background color
+virtual LOGFONT* GetFont() const         // returns cell font as a LOGFONT
+virtual CFont*   GetFontObject() const   // returns a CFont object with the 
+                                         // cell's font
+virtual UINT     GetMargin() const       // returns internal margin for cell
+virtual CGridCtrl* GetGrid() const       // returns grid that cell is associated 
+                                         // with
+virtual CWnd*    GetEditWnd() const      // returns editing window for cell, 
+                                         // or NULL
+    
+virtual BOOL IsEditing() const
+virtual BOOL IsFocused()  const 
+virtual BOOL IsFixed()    const 
+virtual BOOL IsFixedCol() const
+virtual BOOL IsFixedRow() const
+virtual BOOL IsSelected() const 
+virtual BOOL IsReadOnly() const
+virtual BOOL IsModified() const
+virtual BOOL IsDropHighlighted() const
+virtual BOOL IsDefaultFont() const       // TRUE if cell is using default
+                                         // font in grid
+ 
+virtual CGridCellBase* GetDefaultCell() const;
+</PRE>
+<H4>Operators</H4><PRE>virtual void operator=(CGridCellBase&amp; cell);</PRE>
+<H4>Operations</H4><PRE>virtual void Reset();
+ 
+virtual BOOL Draw(CDC* pDC, int nRow, int nCol, CRect rect, 
+                  BOOL bEraseBkgnd = TRUE);
+virtual BOOL GetTextRect( LPRECT pRect)     - dimensions of text 
+                                              within cell
+virtual BOOL GetTipTextRect( LPRECT pRect)  - boundary for tooltips
+virtual CSize GetTextExtent(LPCTSTR str)    - size of text
+virtual CSize GetCellExtent(CDC* pDC)       - size of cell
+ 
+// start and stop cell editing
+virtual BOOL Edit(int nRow, int nCol, CRect rect, 
+                  CPoint point, UINT nID, UINT nChar) 
+virtual void EndEdit()
+ 
+// Validates the results of an edit. If "str" is not a valid 
+// value for the
+// cell then  return FALSE to have the edit rejected
+virtual BOOL ValidateEdit(LPCTSTR str);
+ 
+virtual BOOL PrintCell(CDC* pDC, int nRow, int nCol, CRect rect);
+ 
+// This can ONLY be called by CGridCellBase derived classes, and 
+// not CGridCellBase itself.
+LRESULT SendMessageToParent(int nRow, int nCol, int nMessage);
+</PRE>
+<H4>Overridables</H4><PRE>virtual void OnEndEdit();
+virtual void OnMouseEnter();
+virtual void OnMouseOver();
+virtual void OnMouseLeave();
+virtual void OnClick( CPoint PointCellRelative);
+virtual void OnClickDown( CPoint PointCellRelative);
+virtual void OnRClick( CPoint PointCellRelative);
+virtual void OnDblClick( CPoint PointCellRelative);
+virtual BOOL OnSetCursor();
+</PRE>
+<P>This makes customising cells extremely simple. To install a new type of 
+derived class for your grid cells, you can either override 
+<CODE>CGridCtrl::CreateCell</CODE> and create your derived 
+<CODE>CGridCellBase</CODE> cells, or you can use 
+<CODE>CGridCtrl::SetCellType</CODE> and 
+<CODE>CGridCtrl::SetDeafaultCellType</CODE> to automate this. 
+<P>Simply create a new cell class derived from <CODE>CGridCellBase</CODE> or 
+<CODE>CGridCell</CODE> (eg. <CODE>CMyGridCell</CODE>), and then replace the 
+cells in the grid by calling </P><PRE>MyGrid.SetCellType(row, column, RUNTIME_CLASS(CMyGridCell));</PRE>
+<P>The cell at (row,column) will now be of type <CODE>CMyGridCell</CODE>. 
+<H3><A name=CCellID>The CGridCell class</A></H3>
+<P>This class is derived from <CODE>CGridCellBase</CODE> and provides a default 
+implementation for use with <CODE>CGridCtrl</CODE>. 
+<H3><A name=CCellID>The CCellID class</A></H3>This is a handy helper 
+class used to reference individual cells. All members are public. This class is 
+adapted from Joe Willcoxsons original implementation. <PRE>class CCellID
+{    
+public:
+    int row, col; // The zero based row and column of the cell.
+ 
+    CCellID(int nRow = -1, int nCol = -1)
+ 
+    int IsValid();
+    int operator==(const CCellID&amp; rhs);
+    int operator!=(const CCellID&amp; rhs);
+}
+</PRE>
+<H3><A name=CCellRange>The CCellRange class</A></H3>
+<P>This is a handy helper class used to reference cell ranges. This class is 
+adapted from Joe Willcoxsons original implementation. </P><PRE>class CCellRange
+{ 
+public:
+    CCellRange(int nMinRow = -1, int nMinCol = -1, 
+               int nMaxRow = -1, int nMaxCol = -1);
+    void Set(int nMinRow = -1, int nMinCol = -1, 
+             int nMaxRow = -1, int nMaxCol = -1);
+    
+    int  IsValid() const;
+    int  InRange(int row, int col) const;       // Is the row/col in the range?
+    int  InRange(const CCellID&amp; cellID) const;  // is the cell in the range?
+    
+    CCellID  GetTopLeft() const;                // Get topleft cell in range
+    CCellRange Intersect(const CCellRange&amp; rhs) const;&nbsp;
+                                                // Returns the intersection of
+                                                // two cell ranges
+ 
+    int GetMinRow() const;                      // Self explanatory
+    void SetMinRow(int minRow);
+    int GetMinCol() const;
+    void SetMinCol(int minCol);
+    int GetMaxRow() const;
+    void SetMaxRow(int maxRow);
+    int GetMaxCol() const;
+    void SetMaxCol(int maxCol);
+ 
+    int GetRowSpan() const;                    // Number of rows spanned
+    int GetColSpan() const;                    // Number of columns spanned
+    
+    void operator=(const CCellRange&amp; rhs);
+    int  operator==(const CCellRange&amp; rhs);
+    int  operator!=(const CCellRange&amp; rhs);
+}
+</PRE>
+<P><A name=GV_ITEM>The GV_ITEM structure</A>. This structure is used for 
+Get/SetItem calls. </P><PRE>typedef struct _GV_ITEM {
+        int      row,col;   // Row and Column of item
+        UINT     mask;      // Mask for use in getting/setting cell data
+        UINT     state;     // cell state (focus/hilighted etc)
+        UINT     nFormat;   // Format of cell. Default imaplentation 
+                            // used CDC::DrawText formats
+        CString  szText;    // Text in cell
+        int      iImage;    // index of the list view item’s icon
+        COLORREF crBkClr;   // Background colour (or CLR_DEFAULT)
+        COLORREF crFgClr;   // Forground colour (or CLR_DEFAULT)
+        LPARAM   lParam;    // 32-bit value to associate with item
+        LOGFONT  lfFont;    // cell font
+} GV_ITEM;</PRE><A name=GVL_Values>Grid line or scroll bar selection</A> <PRE>GVL_NONE      // No grid lines
+GVL_HORZ      // Horizontal lines only
+GVL_VERT      // Vertical lines only
+GVL_BOTH      // Both vertical and horizontal lines
+</PRE><A name=AutosizeOption>Autosizing options</A> <PRE>GVS_DEFAULT   // default 
+GVS_HEADER    // Size using column fixed cells data only
+GVS_DATA      // Size using column non-fixed cells data only
+GVS_BOTH      // Size using column fixed and non-fixed
+</PRE><A name=CellMask>Cell data mask</A> <PRE>GVIF_TEXT      // Cell text will be accessed
+GVIF_IMAGE     // Cell image number will be accessed
+GVIF_PARAM     // Cell user data (lParam) will be accessed
+GVIF_STATE     // Cell state will be accessed
+GVIF_BKCLR     // Cell background colour will be accessed
+GVIF_FGCLR     // Cell foreground colour will be accessed
+GVIF_FORMAT    // Cell format field will be accessed
+GVIF_FONT      // Cell logical font will be accessed
+GVIF_MARGIN    // Cell margin information will be accessed 
+GVIF_ALL       // All information will be accessed 
+</PRE><A name=CellState>Cell states</A> <PRE>GVIS_FOCUSED     // Cell has focus
+GVIS_SELECTED    // Cell is selected
+GVIS_DROPHILITED // Cell is drop highlighted
+GVIS_READONLY    // Cell is read-only and cannot be edited
+GVIS_FIXED       // Cell is fixed
+GVIS_FIXEDROW    // Cell is part of a fixed row
+GVIS_FIXEDCOL    // Cell is part of a fixed column
+GVIS_MODIFIED    // Cell has been modified
+</PRE><A name=CellSearch>Cell Searching options</A> <PRE>GVNI_FOCUSED     // Search for focus cell
+GVNI_SELECTED    // Search for selected cells
+GVNI_DROPHILITED // Search for drop highlighted cells
+GVNI_READONLY    // Search for read-only cells
+GVNI_FIXED       // Search for fixed cells 
+GVNI_MODIFIED    // Search for modified cells
+ 
+GVNI_ABOVE       // Search above initial cell
+GVNI_BELOW       // Search below initial cell
+GVNI_TOLEFT      // Search to the left of the initial cell
+GVNI_TORIGHT     // Search to the right of the initial cell
+GVNI_ALL         // Search all cells in the grid starting from
+                 // the given cell
+GVNI_AREA        // Search all cells below and to the right of 
+                 // the given cell
+</PRE><A name=Messages>Notification messages</A> <PRE>GVN_BEGINDRAG      // Sent when dragging starts
+GVN_BEGINLABELEDIT // Sent when inplace editing starts
+GVN_ENDLABELEDIT   // Sent when inplace editing stops
+GVN_SELCHANGING    // Sent just before cell selection changes
+GVN_SELCHANGED     // Sent after cell selection changes
+GVN_GETDISPINFO    // A request for cell information when the grid is 
+                   // in virtual mode
+GVN_ODCACHEHINT    // Cache hint when in virtual mode
+</PRE>
+<P>These messages are exactly the same as their LVN_... counterparts, except 
+they use an NM_GRIDVIEW structure: </P><PRE>typedef struct tagNM_GRIDVIEW { 
+    NMHDR hdr; 
+    int   iRow; 
+    int   iColumn; 
+} NM_GRIDVIEW;
+</PRE>
+<H2><A name=Overrides>Protected overridable functions</A></H2>
+<P>These functions have been made virtual to aid extensiblity. 
+<P><B>Printing</B> - called in OnPrint. </P><PRE>virtual void PrintColumnHeadings(CDC *pDC, CPrintInfo *pInfo);
+virtual void PrintHeader(CDC *pDC, CPrintInfo *pInfo); 
+virtual void PrintFooter(CDC *pDC, CPrintInfo *pInfo);
+virtual void PrintRowButtons(CDC *pDC, CPrintInfo* pInfo);</PRE>
+<P><B>Drag n' drop</B> </P><PRE>// No longer necessary but I thought the code was cool so kept it :).
+virtual CImageList* CreateDragImage(CPoint *pHotSpot)  </PRE>
+<P><B>Mouse Clicks</B> </P><PRE>virtual void OnFixedColumnClick(CCellID&amp; cell);
+virtual void OnFixedRowClick(CCellID&amp; cell);</PRE>
+<P><B>Editing</B> </P><PRE>// Starting edit
+virtual void OnEditCell(int nRow, int nCol, CPoint point, 
+                        UINT nChar) 
+// ending edit
+virtual void OnEndEditCell(int nRow, int nCol, CString str) 
+// Create the inplace edit control
+virtual void CreateInPlaceEditControl(CRect&amp; rect, DWORD dwStyle, 
+                                      int nRow, int nCol,
+                                      LPCTSTR szText, int nChar)</PRE>
+<P><B>Drawing</B> </P><PRE>virtual void OnDraw(CDC&amp; origDC);  // Draws everything</PRE>
+<P><B>Construction and Cleanup</B> </P><PRE>// Creates a new cell and initialises it.
+virtual CGridCellBase* CreateCell(int nRow, int nCol)
+                                                     
+// Destroys a cell and performs any cleanup necessary
+virtual void DestroyCell(int nRow, int nCol)</PRE>
+<H2><A name=Clipboard>Clipboard</A></H2>
+<P>A number of Clipboard functions have been included.<BR>
+<TABLE cellSpacing=0 cellPadding=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><CODE>virtual void OnEditCut()</CODE> </TD>
+<TD class=smallText width="100%">Copies contents of selected cells to clipboard 
+and deletes the contents of the selected cells. (Ctrl-X)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>virtual void OnEditCopy()</CODE> </TD>
+<TD class=smallText width="100%">Copies contents of selected cells to clipboard. 
+(Ctrl-C)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>virtual void OnEditPaste()</CODE> </TD>
+<TD class=smallText width="100%">Pastes the contents of the clipboard to the 
+grid. (Ctrl-V)</TD></TR>
+<TR vAlign=top>
+<TD noWrap><CODE>virtual void OnEditSelectAll()</CODE> </TD>
+<TD class=smallText width="100%">Not actually a clipboard function, but handy 
+nevertheless. This routine selects all cells in the grid. 
+(Ctrl-A)</TD></TR></TBODY></TABLE>
+<H2><A name=EditValidate>Cell Editing and Validation</A></H2>
+<P>There are several ways you can control whether or not cells can be edited, or 
+indeed whether or not changes to cells should be accepted or rejected. 
+<P>The simplest is to use <CODE>SetEditable(BOOL)</CODE>. This determines 
+whether or not the cells in the grid can be edited. Finer scale control can be 
+achieved by setting the <CODE>GVIS_READONLY</CODE> flag on a particular cell: 
+</P><PRE>int row = 1;
+int col = 10;
+m_Grid.SetItemState(row,col, m_Grid.GetItemState(row,col) | GVIS_READONLY);</PRE>
+<P>Further control can be achieved by handling the 
+<CODE>GVN_BEGINLABELEDIT</CODE> message. If the return value for this message is 
+&lt; 0 then the edit attempt for the given cell will be rejected and the cell 
+will be treated as read-only. This message is sent each time an edit attempt is 
+made on a cell. 
+<P>To handle the message, add a handler in your main window: </P><PRE>BEGIN_MESSAGE_MAP(CGridCtrlDemoDlg, CDialog)
+	...
+	// Add a handler
+	ON_NOTIFY(GVN_ENDLABELEDIT, IDC_GRID, OnGridEndEdit)
+END_MESSAGE_MAP()
+ 
+...
+ 
+// GVN_ENDLABELEDIT
+void CGridCtrlDemoDlg::OnGridStartEdit(NMHDR *pNotifyStruct, 
+                                       LRESULT* pResult)
+{
+    NM_GRIDVIEW* pItem = (NM_GRIDVIEW*) pNotifyStruct;
+    
+    // AllowCellToBeEdited is a fictional routine that should return TRUE 
+    // if you want to allow the cell to be edited.
+    BOOL bAllowEdit = AllowCellToBeEdited(pItem-&gt;iRow, pItem-&gt;iColumn);
+ 
+    *pResult = (bAllowEdit)? 0 : -1;
+}
+</PRE>
+<P>Accepting or rejecting the new edited value for the cell can be achieved by 
+handling the <CODE>GVN_ENDLABELEDIT</CODE> message in the same way </P><PRE>// GVN_ENDLABELEDIT
+void CGridCtrlDemoDlg::OnGridEndEdit(NMHDR *pNotifyStruct, 
+                                     LRESULT* pResult)
+{
+    NM_GRIDVIEW* pItem = (NM_GRIDVIEW*) pNotifyStruct;
+    
+    // AcceptChange is a fictional routine that should return TRUE
+    // if you want to accept the new value for the cell.
+    BOOL bAcceptChange = AcceptChange(pItem-&gt;iRow, pItem-&gt;iColumn);
+ 
+    *pResult = (bAcceptChange)? 0 : -1;
+}
+</PRE>
+<P>The final validation method you can use is to derive a new 
+<CODE>CGridCellBase</CODE> class and override the <CODE>ValidateEdit</CODE> 
+method. If this method returns TRUE then the edit is accepted, otherwise the 
+edit is rejected. 
+<H2><A name=Acknowledgements>Acknowledgements</A></H2>
+<P>This would not have been possible without the following authors making their 
+code freely available: 
+<UL>
+<LI><A href="mailto:chinajoe@aol.com">Joe Willcoxson</A>: Joe's original code 
+spurred this project on, and provided the basic structure of this grid control. 
+<LI><A href="mailto:keithr@europa.com">Keith Rule</A>: Keith provided a neat 
+CMemDC class to make flicker free display simple, and provided sample OLE 
+copy/paste/drag/drop code. 
+<LI><A href="mailto:rreddy@braintech.com">Ravi Reddy</A>: I used a derivation of 
+Ravi's listview printing code. 
+<LI><A href="mailto:zafir@home.com">Zafir Anjum</A>: Provided the starting point 
+for my CInPlaceEdit, the sorting routines and the TitleTip code. 
+<LI>Eric Woodruff, Brian V. Shifrin, Scot Reed, Aqiruse, Ken Bertelson, Martin 
+Daly for updates to the version 2.X classes - plus all the dozens that helped 
+with previous versions. 
+<LI>All those who freely contribute code to one another</A>: Without you all I 
+would not have been able to write this. 
+<LI>All those who sent in bug reports, suggestions, improvements and 
+encouragement. Thank you!</LI></UL>
+<H2><A name=History>History</A></H2>
+<TABLE cellSpacing=5 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD noWrap><B>Version</B></TD>
+<TD><B>Comments</B></TD></TR>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>1.0 - 1.13</B><BR>20 Feb 1998 - 6 May 1999</TD>
+<TD class=smallText>First release version. Progressed from being a basic grid 
+based on the original WorldCom Grid control written by Joe Willcoxson 
+(mailto:chinajoe@aol.com, http://users.aol.com/chinajoe) to something a little 
+more feature rich. Rewritten so many times I doubt there is a single line of 
+Joe's code left. Many, many, MANY people sent in bug reports and fixes. Thank 
+you all. </TD></TR>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.0</B><BR>16 Feb 2000</TD>
+<TD class=smallText>Rewritten to make the grid more object oriented, in that the 
+CGridCell class now takes care of cell-specific tasks. This makes the code more 
+robust, but more importantly it allows the simple insertion of other types of 
+cells. Most of the bugs in the previous version have been fixed, especially the 
+"ExpandToFit" functions and the cell selection/focus. I expect I've introduced a 
+bunch more :)</TD></TR>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.01</B><BR>23 Feb 2000</TD>
+<TD class=smallText>Fixes by Eric Woodruff, 
+&lt;Eric_Woodruff@compuserve.com&gt;<BR>Minor MemDC fix, In-place edit 
+WM_KILLFOCUS, "PrintCell" added to CGridCell, plus changes to CGridCell::Draw. 
+Added GetCellTextExtent, SetItemTextFmt to CGridCtrl + better print support. 
+OnRButtonUp handler. various Clipboard and key handling fixes. Search for EFW. 
+</TD></TR>
+<TR vAlign=top>
+<TD class=smallText noWrap><A name=New><B>2.02</B><BR></A>29 Feb 2000 </TD>
+<TD class=smallText>Brian V. Shifrin, Scot Reed<BR>Fixes to reduce flicker, fix 
+font selection bug, Fixed SetFixed[Row/Col]Count bug</TD></TR>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.10</B><BR>11 Mar 2000 </TD>
+<TD class=smallText>Ken Bertelson, Aqiruse and Chris Maunder<BR>Titletips now 
+use cell color<BR>More attribute accessor functions, plus previously private 
+functions now public<BR>Additions for virtual CGridCell support of embedded tree 
+&amp; cell buttons implementation<BR>Optional WYSIWYG printing<BR>Awareness of 
+hidden (0 width/height) rows and columns for key movements, cut, copy, paste, 
+and autosizing<BR>CGridCell can make title tips display any text rather than 
+cell text only<BR>Minor vis bug fixes<BR>CGridCtrl now works with CGridCellBase 
+instead of CGridCell. This is a taste of things to come.<BR></TD>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.11</B><BR>19 May 2000 </TD>
+<TD class=smallText>Chris Maunder + Co<BR>Increasing fixed cells clashed with 
+selected cells (Ivan Ilinov)<BR>AutoSizeRows obvous bug fixed<BR>OnLButtonDown 
+fix (Ken Bertelson) <BR>ExpandToFit bug fixed (scrollbar space) (Igor 
+Proskuriakov)<BR>List mode selection/deselection fixed<BR>Keyboard cell movement 
+improved. You can now see the cells!<BR>m_nBarState MS madness fixed (Phil 
+K)<BR></TD>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.12</B><BR>26 May 2000 </TD>
+<TD class=smallText>Martin Richter's fixes:<BR>If using TRY/CATCH (winCE) 
+instead of try/catch (win32), e-&gt;Delete is not called<BR>EnsureVisible "fix" 
+was fixed properly.<BR></TD>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.13</B><BR>28 May 2000 </TD>
+<TD class=smallText>Chris Maunder, Martin Richter, Ken 
+Bertelson<BR>AutoSizeColumn works on either column header, data or 
+both<BR>EnsureVisible. The saga continues.<BR>Rewrote exception 
+handling<BR>Added the Get/EnableColumnHide and Get/EnableRowHide 
+functions<BR></TD>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.20</B><BR>29 July 2000</TD>
+<TD class=smallText>Font storage optimised (suggested by Martin 
+Richter)<BR>AutoSizeColumn works on either column header, data or 
+both<BR>EnsureVisible. The saga continues... (Ken)<BR>Rewrote exception 
+handling<BR>Added TrackFocusCell and FrameFocusCell properties, as well as 
+ExpandLastColumn (suggested by Bruce E. Stemplewski).<BR>InsertColumn now allows 
+you to insert columns at the end of the column range (David 
+Weibel)<BR>Shift-cell-selection more intuitive<BR>API change: Set/GetGridColor 
+now Set/GetGridLineColor<BR>API change: Set/GetBkColor now 
+Set/GetGridBkColor<BR>API change: Set/GetTextColor, Set/GetTextBkColor 
+depricated <BR>API change: Set/GetFixedTextColor, Set/GetFixedBkColor depricated 
+<BR>Stupid DDX_GridControl workaround removed.<BR>Added "virtual mode" via 
+Set/GetVirtualMode<BR>Added SetCallbackFunc to allow callback functions in 
+virtual mode<BR>Added Set/GetAutoSizeStyle<BR>AutoSize() bug fixed<BR>added 
+GVIS_FIXEDROW, GVIS_FIXEDCOL states<BR>added 
+Get/SetFixed[Row|Column]Selection<BR>cell "Get" methods now const'd. Sorry 
+folks...<BR>GetMouseScrollLines now uses win98/W2K friendly 
+code<BR>WS_EX_CLIENTEDGE style now implicit<BR></TD>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.21</B><BR>30 Aug 2000</TD>
+<TD class=smallText>re-jigged OLE initialisation and drag/drop 
+registration<BR>Cut and Paste bug fixed (empty cells not being treated 
+correctly)<BR>Added "bExpandFixed" parameter to Expand*ToFit functions 
+(Hans-Peter Werner)<BR>SetRedraw bug fixed<BR>Resizing 0-width last row and 
+column now works<BR>Fixed CreateCell SetFormat bug (Loic Baudry)<BR>Fixed 
+GetFixedTextColor typo (raybie@Exabyte.COM)<BR>Modified EnableScrollBars calls 
+in Expand*ToFit functions (Simon Hughes)<BR>GetCellFromPt now 
+public<BR>GV_CACHEHINT sent more appropriately, and also sent with -1 cellrange 
+at the end of operations (so App can discard data - Martin 
+Richter)<BR>CGridCellBase::operator= checks for NULL font before setting (Martin 
+Richter)<BR>After drag/drop, mouse button was still marked as "down". 
+Fixed.<BR></TD>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.22</B><BR>1 Jan 2001</TD>
+<TD class=smallText>SetModified bug in SetItem (Keith Worden)<BR>ifdef around 
+SetItemTextFmt corrected for win32<BR>Save() bug fixed (row 0 saved 
+twice)<BR>GetTopleftNonFixedCell, GetUnobstructedNonFixedCellRange and 
+GetVisibleNonFixedCellRange have optional parameter to force recalc.<BR>added 
+virtual ValidateEdit.<BR>if the return value from the SendMessage operation for 
+GVN_ENDLABELEDIT or GVN_BEGINLABELEDIT is &lt; 0 then the edit, or the attempt 
+to edit (respectively) is rejected.<BR>Added GetEditWnd to 
+CGridCellBase<BR>Fixed the paste bug for cells being edited (Gary 
+Lyben).<BR>GVN_SELCHANGING/GVN_SELCHANGED messages now sent 
+correctly<BR>OnRButtonUp was not handling clicks on fixed cells 
+correctly<BR>SB_ENDSCROLL message now sent on keypress initiated 
+scroll<BR>GetCellTextExtent bug fixed (Elco)<BR>SetSelectedRange inefficiency 
+fixed by huangchaoyi (ahaa007@263.net)<BR>DT_NOCLIP removed from 
+CGridCellBase::Paint<BR>SetRowCount returns correct value on OOM condition 
+(asigal@hotmail.com)<BR>Bug when editing using Japanese characters fixed 
+(Michael Dunn)<BR>Fixed columns and rows printed correctly (fletch - 
+untested)<BR>Added the "ClearCells" function<BR>Added the "SetCompareFunction" 
+function and revamped sorting<BR>Added "GetEditWnd()" to CGridCellBase<BR>Added 
+"GetTipText" to CGridCellBase<BR>
+<TR>
+<TD class=smallText vAlign=top noWrap><B>2.23</B><BR>22 July 2001</TD>
+<TD class=smallText>Save/Load now take optional second parameter to set 
+separator character<BR>When in list mode, fixed columns are no longer 
+editable<BR>Combobox grid cells now auto-resize correctly<BR>Cells are printed 
+using printer font, not screen font (Laura Michaels)<BR>ExpandLastColumn fixed 
+(Jim Arnold)<BR>When entering DBCS chars into cells the first char was being 
+lost (KiteFly)<BR>EnsureVisible no longer steals the focus 
+(Damir)<BR>Ctrl+mouse-click no longer puts a cell into edit mode (useful for 
+unselecting) (Richard Bouwman)<BR>SetModified/GetModified wasn't handling the 
+first row or column (Ivan Melnychuk)<BR>GetCellFromPt Fixed cell check bug fixed 
+(Jim Arnold)<BR>Plus a few nips and tucks (Simon Hughes and others)<BR>SetItem 
+bug when setting select state fixed (Mik)<BR>ComboCell draw error (Joanna 
+Sadler)<BR>NULL pointer reference bug fixed in GetTextRect (Jim 
+Arnold)<BR>Drag/Drop handler functions now virtual<BR>Print() now accepts a 
+pointer to a CPrintDialog object, so you can use your own print dialog when 
+printing (Andrew Truckle)<BR>Cell drawing now uses CGridCellBase::GetTextExtent, 
+which simplifies drawing logic for derived classes that embed controls. See the 
+Checkbox cell for more info<BR>ValidateAndModifyCellContents no longer modifies 
+read-only cells<BR>Drag and drop can now start from read-only cells (Jim 
+Arnold)<BR>ResetScrollBars fixed (not fully checked though) - Paul 
+Runstedler<BR>EraseBkgnd vis problem fixed (Sean McKinnon)<BR>ExpandLastColumn, 
+ExpandRowsToFit and ExpandColumnsToFit now respect hidden 
+rows/columns.<BR><B>Thanks to Podsypalnikov Eugen</B> for the DateTimeCtrl cell 
+type. </TD></TR>
+<TR vAlign=top>
+<TD class=smallText noWrap><B>2.24</B><BR>4 July 2002</TD>
+<TD class=smallText>Corrected compile errors in Visual C++ .NET<BR>Added 
+CGridCellNumeric cell type - Andrew Truckle<BR>Selecting cells using the 
+keyboard sends GVN_SELCHANG* messages to the parent - Arthur Westerman/Scot 
+Brennecke<BR>When printing, the cells now use the grid's default cell colour 
+unless otherwise specified<BR>Tabbing over hidden rows now works 
+correctly<BR>EnsureVisible bug where NULL pFocusWnd was being used fixed - 
+Patrick DellEra<BR>Client border now shows at startup even if size if cells is 
+smaller than size of grid client area<BR>CGridCellBase members pure virtual - 
+Scot Brennecke<BR>Minor code cleanups and clarifications<BR>Minor speed 
+improvements (eg Optimised OnDraw for invisible cells)<BR>Pasted cells now set 
+as selected<BR>Clicking on a fixed row no longer sets a focus cell (David 
+Pritchard)<BR>DEL key now clears all selected cells </TD></TR>
+<TR>
+<TD class=smallText noWrap><B>2.25</B><BR>13 Mar 2004</TD>
+<TD class=smallText>Minor changes so it will compile in VS.NET 2003 and 
+Whidbey<BR>Fixed minor bug in EnsureVisible - Junlin Xu<BR>Changed 
+AfxGetInstanceHandle for AfxGetResourceHandle in RegisterWindowClass<BR>Various 
+changes thanks to Yogurt</TD></TR>
+<TR vAlign=top>
+<TD class=smallText noWrap><B><A name=New>2.26</A><BR></B>15 Dec 2005</TD>
+<TD class=smallText>All changes by Pierre Couderc<BR>Added sort in Virtual 
+mode<BR>Change row/column order programatically or via drag and drop<BR>Added 
+save/restore layer (for undoing row/column order 
+changes)</TD></TR></TBODY></TABLE></span>
+<!-- End Article -->
+ 
+ 
+ 
+ 
+</div> 
+</body>
+</html>
+

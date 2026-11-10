@@ -1,0 +1,32 @@
+This snippet is based on a CodeProject competition. The original CodeProject article associated with it can be found here: http://www.codeproject.com/KB/recipes/FIFF.aspx
+
+The Introduction (excerpt):
+--------------------------------------------- 
+ 
+This article presents an application that calculates and displays the differences between two text files. It is written to meet the challenge in the Code Lean and Mean programming competition of Code Project. This entry is for the .NET (C#) category. When FIFFConsole is run with the test files included in the challenge, it completes in 109 ms (or less) and takes about 952 kB of memory on AMD 1.6 GHZ laptop with 2GB RAM. I claim that the algorithm that it implements, for most practical purposes, runs in linear time and space, O(m), where m is the number of differences between the two files.
+
+After the original publication, a request was made to extend the functionality to allow the comparison of files in a non-sequential order. For example, if the first file contains two lines and the second file contains the same two lines but in reverse order, then no differences should be reported between the files. In other words, if a token form one file exists somewhere in the body of the other file, then that token is excluded from any differences reported between the files. This feature is added in version 0.2 of the application as a scope change where the original performance metrics are unchanged or slightly improved.
+
+The presentation follows the mini software development life cycle (SDLC) that led to the proposed solution.
+
+The Algorithm (excerpt):
+--------------------------------------------- 
+In the heart of the solution is the algorithm used to calculate the text file differences. It reads chunks of data from each file until it detects a difference. Then it re-reads the same chunk, token by token. The definition of token is flexible; in some configurations, it may be a word, in others it may be a line, etc. Once the first token difference is reached, the tokens' hash codes get stored in temporary storage. The temporary storage can be an array but it can also be a hash table, B tree, etc. Reading from the files continues in this manner until a token from one file is found hashed in the other's file temporary storage. At this point the difference is finalized, the temporary storage is cleared and we continue by reading chunks of data. This algorithm is symmetric.
+
+version 0.2: While this principle is preserved, the algorithm is extended to allow for the files to be fully read and their tokens stored prior to processing in the case of not ordered or not optimized comparisons.
+
+Alternatively, the Longest common subsequence problem (LCS) [http://en.wikipedia.org/wiki/Longest_common_subsequence_problem, http://www.ics.uci.edu/~eppstein/161/960229.html, http://wiki.winmerge.org/wiki/InLineDifferencingThoughts] provides a proven method for file comparisons. However, in my opinion, a variation of it can be used here because we deal with large files with small differences that are at a coarser granularity (line level).
+
+version 0.2: The LCS method cannot be applied to not ordered comparisons at all.
+
+The Time (excerpt):
+--------------------------------------------- 
+Let n be the longest single difference between the two files as measured by the number of tokens in that difference and let m be the total number of differences. Then the algorithm runs in linear space, O(n), and completes in polynomial time, O(m*(1 + 2 + ... + n)) = O(m*n^2). 
+
+The worst case scenario is when the two files are completely different. Then, provided that we tokenize by line, n = Min(k, l) where k is the number of lines in the first file and l is the number of lines in the second file, and m = 1. Thus, the algorithm finishes in O(n^2) time. If, for example, we used sorted list rather than an array, we could run a binary search on it in O(log n) time, but we would have to include O(n) time for insertion into the list. Since the frequencies of insertions and searches are the same, there is no gain in that approach. 
+
+The best case scenario is when the two files are the same, n = 0, m = 0. Then the algorithm finishes in constant time and space, O(1). 
+
+For the purposes of the competition, as we compare large files with small changes, the max length of a difference between two such files is independent of their length. In other words, it is a constant. Therefore, the algorithm runs in linear space and time, O(m), n~1!
+
+Note: The implementation is not suitable for comparing large files with a lot of changes. For instance, while 3MB (or any other size) files with 3 different tokens (changes) can be compared in less than 100ms, 3MB with 15000 different tokens (changes) takes up to 2 minutes.   

@@ -1,0 +1,7 @@
+Comparing ../original/test/This is a text.txt to ../original/test/This is convoluted text that my sister wrote.txt...
+8a 8convoluted 15
+24that -129my -132sister -139wrote.
+
+
+Total number of differences: 5
+

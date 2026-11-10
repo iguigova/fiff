@@ -1,0 +1,519 @@
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Article Source</title>
+<link rel="stylesheet" type="text/css" href="/App_Themes/Std/CSS/CodeProject.css?dt=2.3.110630.1" />
+<base href="http://www.codeproject.com/KB/recipes/" />
+</head>
+<body>
+<!--
+HTML for article "Code Lean and Mean File DIFF (FIFF) Application" by Ilka Guigova
+URL: http://www.codeproject.com/KB/recipes/FIFF.aspx
+Copyright 2009 by Ilka Guigova
+All formatting, additions and alterations Copyright © CodeProject, 1999-2011
+-->
+
+
+
+<p><b>Please choose 'View Source' in your browser to view the HTML, or File | Save to save this 
+file to your hard drive for editing.</b></p>
+
+<hr class="Divider subdue" />
+<div>
+
+
+
+
+<!-- Start Article -->
+<span id="ArticleContent">
+<ul class="download">
+<li><a href="https://github.com/iguigova/snippets_csharp/tree/FIFFConsole/FIFFConsole">Latest Revision</a></li>
+<li><a href="FIFF/FIFF0.2a.zip">Download FIFFConsole 0.2a -&nbsp;194 KB</a> </li>
+
+<li><a href="FIFF/FIFF0.1.zip">Download FIFFConsole 0.1 -&nbsp;259 KB </a></li>
+</ul>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#I">Introduction</a> </li>
+
+<li><a href="#A">Analysis</a> </li>
+
+<li><a href="#G">Algorithm</a> </li>
+
+<li><a href="#D">Design</a> </li>
+
+<li><a href="#S">Implementation</a> </li>
+
+<li><a href="#T">Integration</a> </li>
+
+<li><a href="#C">Conclusion</a> </li>
+
+<li><a href="#RevisionHistory">Revision History</a> </li>
+</ul>
+
+<h2><a name="I"></a>Introduction</h2>
+
+<p>This article presents an application that calculates and displays the differences between two text files. It is written to meet the challenge in the <a href="http://www.codeproject.com/script/Awards/View.aspx?cid=358">Code Lean and Mean</a>[<a title="New Window" href="http://www.codeproject.com/script/Awards/View.aspx?cid=358" target="_blank">^</a>] programming competition of <a href="http://www.codeproject.com/">Code Project</a>[<a title="New Window" href="http://www.codeproject.com/" target="_blank">^</a>]. This entry is for the .NET (C#) category. When <code>FIFFConsole</code> is run with the <a href="http://www.codeproject.com/script/Membership/Uploads/1/Grid.zip">test files</a> included in the challenge, it completes in <strong>109 ms</strong> (or less) and takes about <strong>952 kB</strong> of memory on AMD 1.6 GHZ laptop with 2GB RAM. I claim that the algorithm that it implements, for most practical purposes, runs in linear time and space, O(m), where m is the number of differences between the two files. </p>
+<img width="469" height="232" style="WIDTH: 469px; HEIGHT: 232px" alt="FIFF_Console01.PNG" src="FIFF/FIFF_Console01.PNG" border="0" hspace="0" complete="true" complete="true" /> 
+<p>Sample call: <code>FIFFConsole grid1.html grid2.html 250 13</code></p>
+
+<p>After the original publication, a request was made to extend the functionality to allow the comparison of files in a non-sequential order. For example, if the first file contains two lines and the second file contains the same two lines but in reverse order, then no differences should be reported between the files. In other words, if a token form one file exists somewhere in the body of the other file, then that token is excluded from any differences reported between the files. This feature is added in <strong>version 0.2</strong> of the application as a scope change where the original performance metrics are unchanged or slightly improved.</p>
+<img width="469" height="183" style="WIDTH: 469px; HEIGHT: 183px" alt="FIFF02_Console01.PNG" src="FIFF/FIFF02_Console01.PNG" border="0" hspace="0" complete="true" complete="true" /> 
+<p>Sample call: <code>FIFFConsole grid1.html grid2.html 13 true 250</code></p>
+
+<p>The presentation follows the mini software development life cycle (SDLC) that led to the proposed solution.</p>
+
+<h2><a name="A"></a>Analysis</h2>
+
+<p>Any successful software endeavor has a set of well understood requirements. IBM has an excellent resource on <a href="http://www.ibm.com/developerworks/rational/library/4166.html">Requirements: An introduction by Scott McEwen</a>[<a title="New Window" href="http://www.ibm.com/developerworks/rational/library/4166.html" target="_blank">^</a>].</p>
+
+<p>In our case, the problem domain is defined by the following <strong>needs</strong>:</p>
+
+<ul>
+<li>Calculate and display the differences between two text files 
+<ul>
+<li>Version 0.2: Provide an option to compare files in a non-sequential order </li>
+</ul>
+</li>
+
+<li>Provide small footprint and high performance </li>
+
+<li>Report execution time </li>
+
+<li>Report memory usage </li>
+
+<li>Provide value to a wide variety of developers </li>
+</ul>
+
+<p>These needs lead us to the following <strong>features</strong>:</p>
+
+<ul>
+<li>Provide mechanism for file name input </li>
+
+<li>Provide support for various text file formats </li>
+
+<li>Devise an algorithm that will require least amount of file reads and memory storage 
+<ul>
+<li>version 0.2: Support partial and full file reads </li>
+</ul>
+</li>
+
+<li>Allow room for performance tuning </li>
+
+<li>Allow room for future optimizations </li>
+
+<li>Measure execution time </li>
+
+<li>Measure memory usage </li>
+
+<li>Allow basic output re-formatting </li>
+</ul>
+
+<p>The following <strong>non-features</strong> have not been considered a priority and may have been omitted completely: </p>
+
+<ul>
+<li>Security and access layers </li>
+
+<li>Character encoding concerns </li>
+
+<li>Thread-safety </li>
+
+<li>Asynchronous calls </li>
+
+<li>Exception handling </li>
+
+<li>Graphical user interface </li>
+</ul>
+
+<p>These features and non-features translate to the following <strong>requirements</strong>:</p>
+
+<ul>
+<li>Use .NET C# Console Application with two required arguments that specify the file names </li>
+
+<li>Use up to 3 additional arguments that specify the buffer size, the token delimiter, and the output format 
+<ul>
+<li>Version 0.2: Use additional argument to specify whether the comparison is ordered </li>
+
+<li>Version 0.2: Use internal flag to specify whether the comparison is case sensitive </li>
+</ul>
+</li>
+
+<li>Store only hash codes and file positions to preserve space </li>
+
+<li>Store only hash codes that differ and clear them as soon as the difference is resolved </li>
+
+<li>Scan files at most twice </li>
+
+<li>Scan ahead no more than is necessary and sufficient 
+<ul>
+<li>version 0.2: Provide an option to optimize scanning for ordered comparisons </li>
+</ul>
+</li>
+
+<li>Use efficient hash code generating function as provided by the .NET framework [<a href="http://msdn.microsoft.com/en-us/library/system.object.gethashcode.aspx">^</a>] </li>
+
+<li>Use interfaces to allow for different implementation of the file read and temporary storage objects </li>
+
+<li>Use <code>System.IO.FileStream</code> [<a href="http://msdn.microsoft.com/en-us/library/system.io.filestream.aspx" target="_blank">^</a>] for the file read interface implementation because it is sufficiently optimized </li>
+
+<li>Use <code>System.Collections.Generic.List(T)</code> [<a href="http://msdn.microsoft.com/en-us/library/6sh2ey19.aspx" target="_blank">^</a>] for the temporary storage interface implementation because it is sufficiently optimized </li>
+
+<li>Use generic class [<a title="New Window" href="http://msdn.microsoft.com/en-us/library/sz6zd40f(VS.80).aspx" target="_blank">^</a>] for the algorithm class to supply it with the interface implementation information </li>
+
+<li>Use <code>System.DateTime.Now.Ticks</code> [<a href="http://msdn.microsoft.com/en-us/library/system.datetime.aspx" target="_blank">^</a>] to record execution time 
+<ul>
+<li>Version 0.2: Use <code>System.Diagnostics.Stopwatch</code> [<a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.stopwatch.aspx" target="_blank">^</a>] to accurately measure elapsed time </li>
+</ul>
+</li>
+
+<li>Use <code>System.Diagnostics.Process</code> [<a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.process.aspx">^</a>] to record memory usage </li>
+
+<li>Use <code>System.Text.UTF8Encoding</code> [<a href="http://msdn.microsoft.com/en-us/library/system.text.utf8encoding.aspx" target="_blank">^</a>] to support both Unicode and ASCII text, <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>[<a title="New Window" href="http://en.wikipedia.org/wiki/UTF-8" target="_blank">^</a>] </li>
+</ul>
+
+<h2><a name="G"></a>Algorithm</h2>
+
+<p>In the heart of the solution is the algorithm used to calculate the text file differences. It reads chunks of data from each file until it detects a difference. Then it re-reads the same chunk, token by token. The definition of token is flexible; in some configurations, it may be a word, in others it may be a line, etc. Once the first token difference is reached, the tokens' hash codes get stored in temporary storage. The temporary storage can be an array but it can also be a hash table, B tree, etc. Reading from the files continues in this manner until a token from one file is found hashed in the other's file temporary storage. At this point, the difference is finalized, the temporary storage is cleared and we continue by reading chunks of data. This algorithm is symmetric.</p>
+
+<ul>
+<li>Version 0.2: While this principle is preserved, the algorithm is extended to allow for the files to be fully read and their tokens stored prior to processing in the case of not ordered or not optimized comparisons. </li>
+</ul>
+
+<p>Alternatively, the <a href="http://en.wikipedia.org/wiki/Longest_common_subsequence_problem">Longest common subsequence problem (LCS)</a>[<a title="New Window" href="http://en.wikipedia.org/wiki/Longest_common_subsequence_problem" target="_blank">^</a>] provides a proven method for file comparisons. However, in my opinion, a variation of it can be used here because we deal with large files with small differences that are at a coarser granularity (line level). </p>
+
+<ul>
+<li>Version 0.2: The LCS method cannot be applied to not ordered comparisons at all. </li>
+</ul>
+
+<p>Here is the pseudo-code:</p>
+
+<pre lang="text">open file A, B
+if (hash A != hash B) 
+{
+    while not (EOF A or B) 
+    {
+        if (read buffer A != read buffer B) 
+        {
+            read and store token A, B (if optimized, read one token only)
+			
+            while (store A or B is not empty)
+            {
+                matched = (token A or B exists in store B or A respectfully)
+				
+                if (ordered and matched and (index token A in store B +
+                    index token B in store A &gt; 0)) or (not ordered and not matched) 
+                {
+                    report and clear store A, B to index token B, A in store A, B
+                }
+				
+                if (ordered and matched and (index token A in store B =
+                    index token B in store A)) or (not ordered and matched) 
+                {
+                    clear store A, B at index token B, A in store A, B
+                }
+				
+                if (ordered and optimized) 
+                {
+                    if not matched 
+                    {
+                        read and store token A, B (if optimized, read one token only)
+                    }
+                    else 
+                    {
+                        clear store A, B
+                    }
+                }
+							
+                if (store A or B is empty)
+                {
+                    report and clear store A, B
+                }	
+				
+                get next token A, B at index = (matched || not ordered) ? 0 : Min(
+                    index token A, B in store B, A) + 1				
+            }
+        }	
+    }
+}
+close file A, B</pre>
+
+<p>With limited knowledge of the <a href="http://en.wikipedia.org/wiki/Big_O_notation">Big-O</a>[<a title="New Window" href="http://en.wikipedia.org/wiki/Big_O_notation" target="_blank">^</a>] notation and computer science complex theory, I am unable to provide upper bounds for the time and space usage of the algorithm. However, here are my thoughts. The space consumption is in the temporary storage of hash codes and the time consumption is in searching it. Let n be the longest single difference between the two files as measured by the number of tokens in that difference and let m be the total number of differences. Then the algorithm runs in linear space, O(n), and completes in polynomial time, O(m*(1 + 2 + ... + n)) = O(m*n^2).</p> 
+<p>
+The worst case scenario is when the two files are completely different. Then, provided that we tokenize by line, n = Min(k, l) where k is the number of lines in the first file and l is the number of lines in the second file, and m = 1. Thus, the algorithm finishes in O(n^2) time. If, for example, we used sorted list rather than an array, we could run a binary search on it in O(log n) time, but we would have to include O(n) time for insertion into the list. Since the frequencies of insertions and searches are the same, there is no gain in that approach. </p>
+<p>
+The best case scenario is when the two files are the same, n = 0, m = 0. Then the algorithm finishes in constant time and space, O(1). </p>
+<p>
+For the purposes of the competition, as we compare large files with small changes, the max length of a difference between two such files is independent of their length. In other words, it is a constant. <strong>Therefore, the algorithm runs in linear space and time, O(m), n~1!</strong></p>
+
+<ul>
+<li>Version 0.2: In the case of not ordered or not optimized comparisons, the two files are read into memory prior to processing. Thus, provided we tokenize by line and p = Max(k, l) where k is the number of lines in the first file and l is the number of lines in the second file, the algorithm runs in polynomial space O(p) and time O(p + ... + 2 + 1). </li>
+</ul>
+<p><strong>Note:</strong> The implementation is not suitable for comparing large files with a lot of changes. For instance, while 3MB (or any other size) files with 3 different tokens (changes) can be compared in less than 100ms, 3MB with 15000 different tokens (changes) takes up to 2 minutes. </p>
+
+
+<h2><a name="D"></a>Design</h2>
+
+<h3>Activity Diagram</h3>
+
+<p>The activity diagram below is just a visual representation of the principle behind the algorithm mentioned above. It is straightforward in terms of actions and decision points. The activity diagram helps identify the objects and operations that will be needed during implementation. </p>
+<img width="286" height="290" style="WIDTH: 286px; HEIGHT: 290px" alt="FIFF02_ActivityDiagram.PNG" src="FIFF/FIFF02_ActivityDiagram.PNG" border="0" hspace="0" complete="true" complete="true" /> 
+<h3>Class Diagram</h3>
+
+<p>The class diagram below describes the objects that are used to implement the algorithm. Notice that since the <code>FIFFBroker</code> does not care about the source of the data and the kind of temporary storage that it is going to use as long as certain operations are available to it, <code>IFIFFStream </code>and <code>IFIFFData</code> are defined as interfaces. This provides easy opportunity for future optimizations. The <code>FIFFTuple</code> stored temporary while accumulating a difference is of two integer values in order to save space. The output formatting, reading buffer, and token delimiter are defined independently to allow for performance tuning and basic customizations.</p>
+<img width="640" height="469" style="WIDTH: 640px; HEIGHT: 469px" alt="FIFF02_ClassDiagram.PNG" src="FIFF/FIFF02_ClassDiagram.PNG" border="0" hspace="0" complete="true" complete="true" /> 
+<h3>Sequence Diagram</h3>
+
+<p>The sequence diagram mimics the activity diagram but it helps ensure that all the objects and operations needed to complete the task at hand are identified correctly. Redundant objects and/or operations can be exposed, too.</p>
+<img width="495" height="733" style="WIDTH: 495px; HEIGHT: 733px" alt="FIFF02_SequenceDiagram.PNG" src="FIFF/FIFF02_SequenceDiagram.PNG" border="0" hspace="0" complete="true" complete="true" /> 
+<h2><a name="S"></a>Implementation</h2>
+
+<p>For more details, please have a look at the uploaded <a href="FIFF/FIFF0.2.zip">source files</a>.</p>
+
+<ul>
+<li>Calculate and display the differences between two text files: 
+<pre lang="cs">try
+{
+  FIFFBroker&lt;FIFFStream, FIFFData&gt; broker = new FIFFBroker&lt;FIFFStream, FIFFData&gt;();
+  Console.Write(broker.Compare(args[0], args[1]));
+}
+catch (Exception e)
+{
+  Console.WriteLine(&quot;Exception: &quot; + e.Message);
+}</pre>
+</li>
+
+<li>Measure and report execution time: 
+<pre lang="cs">Stopwatch stopWatch = new Stopwatch(); // DateTime startTime = DateTime.Now;
+stopWatch.Start();
+// ...
+stopWatch.Stop();
+Console.WriteLine(stopWatch.Elapsed); //Console.WriteLine(new TimeSpan(
+    DateTime.Now.Ticks - startTime.Ticks));</pre>
+</li>
+
+<li>Measure and report memory usage: 
+<pre lang="cs">Process FIFFProcess = Process.GetCurrentProcess();
+long startPeakWorkingSet64 = FIFFProcess.PeakWorkingSet64;
+// ...
+FIFFProcess.Refresh();
+Console.WriteLine(&quot;Delta peak physical memory usage: {0}&quot;, 
+	FIFFProcess.PeakWorkingSet64 - startPeakWorkingSet64);
+// Note that because we did not create the process, we should not free it.</pre>
+
+<p>See also: <a href="http://msdn.microsoft.com/en-us/library/xe0c2357.aspx">GC.Collect Method</a>[<a title="New Window" href="http://msdn.microsoft.com/en-us/library/xe0c2357.aspx" target="_blank">^</a>]. </p>
+
+<pre lang="cs">// Put some objects in memory
+// ...
+Console.WriteLine(&quot;Memory used before collection: {0}&quot;, GC.GetTotalMemory(false));
+ 
+// Collect all generations of memory.
+GC.Collect();
+Console.WriteLine(&quot;Memory used after full collection: {0}&quot;, 
+					GC.GetTotalMemory(true));</pre>
+</li>
+</ul>
+
+<h2><a name="T"></a>Integration</h2>
+
+<p>To run <code>FIFFConsole</code> <strong>version 0.2</strong>, open a command prompt, browse to the directory that contains the executable, and invoke it with the following arguments: </p>
+
+<ul>
+<li>&lt;filename1&gt; - The path and name of the first text file, required, default: N/A </li>
+
+<li>&lt;filename2&gt; - The path and name of the second text file, required, default: N/A </li>
+
+<li>&lt;delimiterchar&gt; - The byte representation of the token delimiter, optional, default: <strong>32 </strong>(i.e. whitespace) </li>
+
+<li>&lt;ordered&gt; - The flag indicating whether to perform non-sequential comparison, optional, default: <strong>false</strong> </li>
+
+<li>&lt;buffer&gt; - The size of the chunks read while scanning for differences, optional, default: <strong>4096</strong> (i.e. 4K) </li>
+
+<li>&lt;format&gt; - The output format, optional, default: <strong>{0}1:{1}{2}{0}2:{3}{4}{0}</strong> (where {0} = new line, {1} = the position the difference starts in file 1, {2} = the text that is present in file 1 at this position, {3} = the position the difference starts in file 2, {4} = the text that is present in file 2 at this position) </li>
+</ul>
+
+<p><img width="448" height="221" style="WIDTH: 448px; HEIGHT: 221px" alt="FIFF02_Console02.PNG" src="FIFF/FIFF02_Console02.PNG" border="0" hspace="0" complete="true" complete="true" /></p>
+
+<p>If you want to automate the process and/or compare multiple files at once, you can write a script to select these files, invoke <code>FIFFConsole</code>, and store the result as needed. Here is one such script that given a file in a <em>modified</em> folder, finds the corresponding file (with the same filename) in an <em>original</em> folder, and stores the file difference in another folder. This script is written by Natasha Guigova. A version of it has been used for quality assurance (QA) regression testing.</p>
+
+<pre lang="vbscript">' To run this script, use the command prompt and type: cscript /nologo 
+' &lt;scriptfilename /&gt;.vbs
+ 
+strBaseFolder    = &quot;C:\Sandbox\Test\Original&quot;
+strCurrentFolder = &quot;C:\Sandbox\Test\Modified&quot;
+strResultFolder  = &quot;C:\Sandbox\Test&quot;
+ 
+strExeFile     = &quot;%comspec% /c C:\Sandbox\Test\FIFFConsole.exe&quot;
+ 
+Set objShell = CreateObject(&quot;WScript.Shell&quot;)
+Set objFSO   = CreateObject(&quot;Scripting.FileSystemObject&quot;)
+ 
+Call runCompare
+ 
+Function runCompare
+	On Error Resume Next
+	
+	If objFSO.FolderExists(strResultFolder) = False Then
+		objFSO.CreateFolder(strResultFolder)
+	End If
+ 
+	Set objCurrentFolder = objFSO.GetFolder(strCurrentFolder)
+ 
+	Set colFiles = objCurrentFolder.Files
+ 
+	For Each objFile in colFiles
+		strFileBase    = strBaseFolder    &amp; &quot;\&quot; &amp; objFile.Name
+		strFileCurrent = strCurrentFolder &amp; &quot;\&quot; &amp; objFile.Name
+		strFileResult  = strResultFolder  &amp; &quot;\&quot; &amp; Replace(objFile.Name,
+                       &quot;.html&quot; , &quot;.txt&quot;)
+		strCMD = strExeFile &amp; &quot; &quot; &amp; strFileBase &amp; &quot; &quot; &amp; strFileCurrent &amp;
+                       &quot; 13 true 250  &gt; &quot;   &amp; strFileResult
+		
+		objShell.Run strCmd,0,TRUE
+	Next
+End Function
+ 
+If Err = 0 Then
+  MsgBox &quot;Task Completed&quot;
+Else 
+  MsgBox  &quot;Error Source: &quot; &amp; Err.Source &amp; vbCrLf &amp; _
+	&quot; Error Description: &quot; &amp; Err.Description 
+End If 
+ 
+Set objShell = Nothing
+Set objFSO   = Nothing</pre>
+
+<h2>Points Of Interest</h2>
+
+<p>The <code>buffer</code> argument makes a difference in the performance but not in the memory usage. It allows for chunks of data to be pre-scanned for differences and for the algorithm to be applied only to those chunks that differ rather than to the entire content of the files. I expect that the more differences there are, the smaller the buffer has to be. If it is bigger than the size of the file, it has no effect. For example, when the <code>FIFFConsole </code><strong>version 0.1</strong> is run for the <a href="http://www.codeproject.com/script/Membership/Uploads/1/Grid.zip">test files</a> included in the challenge on AMD 1.6 GHZ laptop with 2GB RAM with <code>buffer</code> size of: </p>
+
+<ul>
+<li>4096 - It takes close to 300 ms to complete </li>
+
+<li>1000 - It takes close to 150 ms to complete </li>
+
+<li>500 - It takes close to 125 ms to complete </li>
+
+<li><strong>250 - It takes close to 109 ms to complete</strong> </li>
+
+<li>100 - It takes close to 140 ms to complete </li>
+
+<li>10 - It takes close to 500 ms to complete </li>
+</ul>
+
+<ul>
+<ul>
+<li>Version 0.2: The <code>buffer</code> argument makes sense only in the context of ordered comparisons with <code>optimized</code> flag set to true. In all other cases, the files are read in completely and the algorithm is applied to the entire content of the files. 
+<p><img width="448" height="457" style="WIDTH: 448px; HEIGHT: 457px" alt="FIFF02_Console03.PNG" src="FIFF/FIFF02_Console03.PNG" border="0" hspace="0" complete="true" complete="true" /></p>
+
+<p><img width="448" height="464" alt="FIFF02_Console04.png" src="FIFF/FIFF02_Console04.png" border="0" hspace="0" complete="true" complete="true" /> </p>
+</li>
+</ul>
+
+<ul>
+<li>Version 0.2: The <code>optimized</code> flag applies to ordered comparisons and indicates whether the files are read in chunks or in their entirety. In the former case, the algorithm is applied only to partial (necessary and sufficient) data and the process takes significantly less time. The resulting differences are equivalent even though they may have slightly varying representations. For example, a deletion maybe reported as edition followed by deletion when there is a repeating token present in both files such as <em>&lt;TR vAlign=top&gt;</em> as in the test files. 
+<p><img width="448" height="400" style="WIDTH: 448px; HEIGHT: 400px" alt="FIFF02_Console05.PNG" src="FIFF/FIFF02_Console05.PNG" border="0" hspace="0" complete="true" complete="true" /> </p>
+</li>
+</ul>
+</ul>
+
+<p>The <code>delimiterchar </code>argument is a stub at tuning. It is used to define tokens. Tokens are used to calculate difference. When the <code>delimiterchar </code>is whitespace, we deal with words. The caveat being that it does not deal well with punctuation. 'Text' and 'Text,' will be considered different tokens. Using whitespace as a token delimiter is not recommended in the case of HTML or XML files because '&lt;h3&gt;Revision &lt;/h3&gt; ' will be tokenized as '&lt;h3&gt;Revision' and '&lt;/h3&gt;'. Despite the char associated with the <code>delimiterchar</code>, tokens are never bigger than a line. It is possible to define smarter logic for tokenizing the text but it is outside of the scope of this challenge. </p>
+
+<p>Based on the output, the file contents can be restored. The output includes information for the position in file 1, the diff in file 1, and the diff in file 2. Thus,</p>
+
+<ul>
+<li>Addition (+) is equivalent to diff in file 1 being empty </li>
+
+<li>Deletion (-) is equivalent to diff in file 2 being empty </li>
+
+<li>Edition (.) is equivalent to both diff in file 1 and diff in file 2 present </li>
+</ul>
+
+<h3>Test Cases</h3>
+
+<p>Consider the following text examples and how they compare:</p>
+
+<ul>
+<li>This is a text </li>
+
+<li>This is a text simple </li>
+
+<li>This is a simple text </li>
+
+<li>This is a simple text, right? </li>
+
+<li>This is a complex text </li>
+
+<li>This is a complex convoluted text. </li>
+
+<li>This is convoluted text that my sister wrote. </li>
+
+<li>This text is in red </li>
+
+<li>I like ice-cream! :D </li>
+</ul>
+
+<h2><a name="C"></a>Conclusion</h2>
+
+<p>There are several easy ways in which the proposed implementation can be extended: </p>
+
+<ul>
+<li>By generating an event upon difference finalization in order to notify any subscribers </li>
+
+<li>By realizing the <code>IFIFFStream</code> interface for objects other than files </li>
+
+<li>By implementing a delimiter lookup table in order to support a more flexible set of tokens </li>
+
+<li>By working only with byte arrays (rather than <code>string</code>s) in order to support binary files and other generic input </li>
+</ul>
+
+<p>The algorithm and the implementation described in this article are designed to be lean, mean, scalable, and extensible. I will be glad to get your comments.</p>
+
+<h2><a name="E"></a>Resources</h2>
+
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/336wast5.aspx">Basic File I/O</a>[<a title="New Window" href="http://msdn.microsoft.com/en-us/library/336wast5.aspx" target="_blank">^</a>] </li>
+
+<li><a href="http://msdn.microsoft.com/en-us/library/k3352a4t.aspx">File and Stream I/O</a>[<a title="New Window" href="http://msdn.microsoft.com/en-us/library/k3352a4t.aspx" target="_blank">^</a>] </li>
+
+<li><a href="http://msdn.microsoft.com/en-us/library/ms379564(VS.80).aspx">An Introduction to C# Generics</a>[<a title="New Window" href="http://msdn.microsoft.com/en-us/library/ms379564(VS.80).aspx" target="_blank">^</a>] </li>
+</ul>
+
+<h2><a name="RevisionHistory"></a>Revision History</h2>
+
+<ul>
+<li>2011-07-02: Applied bug fixes</li>
+
+<li>2011-07-02: Added performance clarification (thanks to Qwertie)</li>
+
+<li>2011-04-25: Modified size of some of the images in the article</li>
+
+<li>2010-01-13: Added VB script for process automation (thanks to Natasha Guigova) </li>
+
+<li>2010-01-10: Added <strong>version 0.2</strong> with support for non-sequential file comparison </li>
+
+<li>2009-08-27: Added to the notes in the Algorithm section claiming linear space and time execution </li>
+
+<li>2009-08-27: Added test machine specs </li>
+
+<li>2009-08-27: Added reference to <code>GC.Collect() </code>(thanks to Luc Pattyn) </li>
+
+<li>2009-08-24: Added a conclusion </li>
+
+<li>2009-08-24: Added time and space upper bound estimation </li>
+
+<li>2009-08-22: Published on CodeProject </li>
+</ul>
+
+</span>
+<!-- End Article -->
+
+
+
+
+</div> 
+</body>
+</html> 

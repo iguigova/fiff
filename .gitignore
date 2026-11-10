@@ -1,0 +1,5 @@
+csharp/bin/
+csharp/obj/
+csharp/out/
+csharp/build.log
+csharp/cases.tsv

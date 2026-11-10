@@ -1,0 +1,30 @@
+Comparing ../original/test/grid1.html to ../original/test/grid2.html...
+13631363<H2>Version 2</H2>
+<p>This is the modified version. There are 5 changes</p>
+<ul>
+	<li>A visible addition</li>
+	<li>A visible deletion</li>
+	<li>A visible text change</li>
+	<li>A linebreak removal</li>
+	<li>A non-visible change to the underlying HTML markup.</li>
+</ul>
+<p>Find them all as fast and as efficiently as you can.</p>
+7911<TD><CODE>gridctrl.cpp, gridctrl.h</CODE></TD>
+8240<TD><CODE lang="Text">gridctrl.cpp, gridctrl.h</CODE></TD>
+8627<TD noWrap><CODE>GridDropTarget.cpp, GridDropTarget.h</CODE></TD>
+<TD>Grid control OLE drag and drop target. Only necessary if you don't define 
+8968<TD noWrap><CODE>GridDropTarget.cpp, GridDropTarget.h</CODE></TD><TD>Grid control OLE drag and drop target. Only necessary if you don't define 
+63295<TD noWrap><CODE>void SetShadedPrintOut(BOOL bEnable = TRUE)</CODE> </TD>
+<TD class=smallText width="100%">If TRUE, colored cells will print as-is. If 
+FALSE, all text prints as black on white.</TD></TR>
+63635<TD noWrap><CODE>BOOL GetShadedPrintOut()</CODE> </TD>
+<TD class=smallText width="100%">Get's whether or not cells are printed shaded 
+or as-is.</TD></TR>
+63515<TD noWrap><CODE>BOOL GetShadedPrintOut()</CODE> </TD>
+<TD class=smallText width="100%">Get's whether or not cells are printed shaded 
+or as-is.</TD></TR>
+<TR vAlign=top>
+63806
+
+Total number of differences: 5
+
