@@ -49,3 +49,5 @@ check, and fixes these causes at their source in `src/fiff.js`:
   in file 1; else both are a difference.
 - Ordered mode, when each side holds the other's current token, ends the
   difference at the nearer of the two matches.
+- Ordered mode, at the end of a file, reports the rest only once every token
+  has been looked for in the other side.

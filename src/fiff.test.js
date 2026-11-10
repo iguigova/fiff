@@ -64,3 +64,8 @@ const ORDERED = { ...DEFAULTS, format: '[{1}:{2}|{3}:{4}]' };
 
 test('ordered: when each side holds the other\'s token, the nearer match ends the difference', () =>
   assert.equal(compare(bytes('x simple text y \n'), bytes('x text simple y \n'), ORDERED), total('[2:|2:text ][9:text |14:]', 2)));
+
+test('ordered: at the end of a file the shared line end is no difference', () => {
+  assert.equal(compare(bytes('This is a text \n'), bytes('This is a text simple \n'), ORDERED), total('[15:|15:simple ]', 1));
+  assert.equal(compare(bytes('a b c \n'), bytes('a \n'), ORDERED), total('[2:b c |2:]', 1));
+});

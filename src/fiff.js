@@ -152,9 +152,13 @@ export const compare = (bytes1, bytes2, options = DEFAULTS) => {
       if (matched) { removeAt(d1, idx1); removeAt(d2, idx2); }
       if (optimized) { readIn(s1, d1, s1.next, bothOpen); readIn(s2, d2, s2.next, bothOpen); }
     }
+    const next = matched || !ordered ? 0 : Math.min(idx1, idx2) + 1;
     const oneSided = (d1.length === 0 && d2.length > 0) || (d2.length === 0 && d1.length > 0);
-    if (oneSided || atEnd) report(d1.length, d2.length);
-    return matched || !ordered ? 0 : Math.min(idx1, idx2) + 1;
+    // At the end of a file the rest of both files is read in, and is reported
+    // only once every token has been looked for in the other side.
+    const unmatchable = atEnd && next >= Math.max(d1.length, d2.length);
+    if (oneSided || unmatchable) report(d1.length, d2.length);
+    return next;
   };
 
   // Ordered: where the difference ends. File 2's token at idx found at match1
