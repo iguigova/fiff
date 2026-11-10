@@ -47,3 +47,5 @@ check, and fixes these causes at their source in `src/fiff.js`:
 - Unordered mode takes one token a step: file 1's first token, found anywhere
   in file 2, leaves with its match; else file 2's first token, found anywhere
   in file 1; else both are a difference.
+- Ordered mode, when each side holds the other's current token, ends the
+  difference at the nearer of the two matches.

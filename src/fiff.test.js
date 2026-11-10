@@ -59,3 +59,8 @@ test('unordered: a token absent from the other file is a difference', () =>
 
 test('unordered: a token absent from file 1 is a difference even when file 1 goes on matching', () =>
   assert.equal(compare(bytes('b \n'), bytes('c d b \n'), UNORDERED), total('[-1:|0:c ][-1:|2:d ]', 2)));
+
+const ORDERED = { ...DEFAULTS, format: '[{1}:{2}|{3}:{4}]' };
+
+test('ordered: when each side holds the other\'s token, the nearer match ends the difference', () =>
+  assert.equal(compare(bytes('x simple text y \n'), bytes('x text simple y \n'), ORDERED), total('[2:|2:text ][9:text |14:]', 2)));

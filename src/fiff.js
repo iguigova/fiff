@@ -157,6 +157,15 @@ export const compare = (bytes1, bytes2, options = DEFAULTS) => {
     return matched || !ordered ? 0 : Math.min(idx1, idx2) + 1;
   };
 
+  // Ordered: where the difference ends. File 2's token at idx found at match1
+  // in file 1 ends it at (match1, idx); file 1's found at match2 ends it at
+  // (idx, match2); when both are found, the one that ends it sooner wins.
+  const syncOrdered = (idx, match1, match2) => {
+    if (match1 > UNDEFINED && (match2 === UNDEFINED || match1 <= match2)) return [match1, idx];
+    if (match2 > UNDEFINED) return [idx, match2];
+    return [idx, idx];
+  };
+
   // Unordered: file 1's first token, found anywhere in file 2, leaves with its
   // match; else file 2's first token, found anywhere in file 1; else both are
   // a difference.
@@ -174,9 +183,7 @@ export const compare = (bytes1, bytes2, options = DEFAULTS) => {
       if (!ordered) {
         idx = stepUnordered(match1, match2);
       } else {
-        const idx1 = match1 > UNDEFINED && match2 === UNDEFINED ? match1 : idx;
-        const idx2 = match2 > UNDEFINED && match1 === UNDEFINED ? match2 : idx;
-        idx = step(idx1, idx2, match1 + match2 >= UNDEFINED);
+        idx = step(...syncOrdered(idx, match1, match2), match1 + match2 >= UNDEFINED);
       }
     }
   };
