@@ -49,11 +49,18 @@ export const sound = run => {
   return one === two ? [] : ['the text outside the differences is not the same in both files'];
 };
 
-// Ordered: the differences hold no more tokens than the smallest diff.
+// The tokens the differences hold, and the tokens the smallest diff holds.
+export const size = run => ({
+  reported: SIDES.reduce((n, side) => n + tokenCount(run[side[0]], spans(run, side), run.delimiter), 0),
+  smallest: minimalEdit(keys(run.bytes1, run.delimiter), keys(run.bytes2, run.delimiter)),
+});
+
+// Ordered: the differences hold no more tokens than the smallest diff. FIFF
+// does not promise it, so it judges the original's record and is a figure
+// for the port.
 export const minimal = run => {
-  const got = SIDES.reduce((n, side) => n + tokenCount(run[side[0]], spans(run, side), run.delimiter), 0);
-  const want = minimalEdit(keys(run.bytes1, run.delimiter), keys(run.bytes2, run.delimiter));
-  return got === want ? [] : [`differences hold ${got} tokens, the smallest diff ${want}`];
+  const { reported, smallest } = size(run);
+  return reported === smallest ? [] : [`differences hold ${reported} tokens, the smallest diff ${smallest}`];
 };
 
 // Unordered: each side reports exactly its tokens absent from the other file.
@@ -65,6 +72,10 @@ export const exact = run => {
   ];
 };
 
+// What a correct answer satisfies.
 export const checks = run => run.ordered
-  ? { counted, placed, sound, minimal }
+  ? { counted, placed, sound }
   : { counted, placed, exact };
+
+// The checks, and in ordered mode the smallest diff too.
+export const strict = run => (run.ordered ? { ...checks(run), minimal } : checks(run));

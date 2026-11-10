@@ -10,16 +10,19 @@ against a reference diff.
 - `csharp/record.sh` builds it on .NET 8 in Docker and runs it on every case
   in `check/cases.js`, writing `record/csharp/<case>.out`.
 - `src/fiff.js` is the JS port, for Node and the browser, with no
-  dependencies; `src/cli.js` takes FIFFConsole's arguments. On every case it
-  reports the differences the original reports.
-- `check/` judges a result: the differences counted match those listed; each
-  sits in its file where it says; in ordered mode, removing them leaves the
-  same text in both files, and they hold no more tokens than the smallest
-  diff, by longest common subsequence; in unordered mode, each side reports
-  exactly its tokens absent from the other file.
+  dependencies; `src/cli.js` takes FIFFConsole's arguments.
+- `check/` judges a result. A correct answer counts as many differences as
+  it lists, and each sits in its file where it says; in ordered mode,
+  removing them leaves the same text in both files; in unordered mode, each
+  side reports exactly its tokens absent from the other file. Its size is the
+  tokens the differences hold, against the smallest diff by longest common
+  subsequence.
 
-`npm test` runs the port against the record, the port's own tests and the
-checker's. `npm run original` runs the checks on the record.
+`npm test` runs the checks on the port's answers, holds them to no larger
+than the original's in ordered mode and to the original's wherever the
+original passes every check and the smallest diff, and runs the port's and
+the checker's own tests. `npm run original` runs the checks and the smallest
+diff on the record.
 
 The cases are those of `original/test/TestHarness.bat` whose files the branch
 holds, under the five argument sets of `FIFFConsoleTestHarness.bat`, and the
@@ -41,8 +44,7 @@ failing case through the code:
 
 ## What the port fixes
 
-The port answers as the original does wherever the original passes every
-check, and fixes these causes at their source in `src/fiff.js`:
+The port fixes the first four causes at their source in `src/fiff.js`:
 
 - Unordered mode takes one token a step: file 1's first token, found anywhere
   in file 2, leaves with its match; else file 2's first token, found anywhere
@@ -54,3 +56,8 @@ check, and fixes these causes at their source in `src/fiff.js`:
 - A side with no tokens left in a difference gives as its position how far
   its file has been read: in ordered mode where the other side's text goes,
   in unordered mode the end of the file.
+
+The fifth cause is FIFF's design, which trades the smallest diff for time
+linear in the differences when they are few (`original/README`): the port
+keeps it, and on the competition test reports 25 lines where the smallest
+diff is 19.

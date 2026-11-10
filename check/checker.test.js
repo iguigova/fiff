@@ -6,13 +6,13 @@ import assert from 'node:assert/strict';
 import { tokenize } from './tokens.js';
 import { lcsLength, minimalEdit, absent } from './reference.js';
 import { parse, SENTINEL_FORMAT } from './parse.js';
-import { checks, locate } from './check.js';
+import { strict, locate } from './check.js';
 
 const run = (text1, text2, hunks, ordered = true) => ({
   bytes1: Buffer.from(text1), bytes2: Buffer.from(text2), delimiter: 32, ordered, hunks, total: hunks.length,
 });
 
-const verdicts = r => Object.fromEntries(Object.entries(checks(r)).map(([k, f]) => [k, f(r).length === 0]));
+const verdicts = r => Object.fromEntries(Object.entries(strict(r)).map(([k, f]) => [k, f(r).length === 0]));
 
 const A = 'This is a text \n';
 const B = 'This is a simple text \n';
