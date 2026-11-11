@@ -15,7 +15,9 @@ export const tokenize = (bytes, delimiter) => {
   return ranges;
 };
 
-export const decode = bytes => Buffer.from(bytes).toString('utf8');
+const DECODER = new TextDecoder('utf-8', { ignoreBOM: true });
+
+export const decode = bytes => DECODER.decode(bytes);
 
 // FIFF reports with IgnoreCase on, so two texts are the same text when they
 // differ only in case.

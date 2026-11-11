@@ -1,0 +1,49 @@
+/* The demo's own rules, over brand.css: the form, the two marked files and
+   the table of differences. A colour that differs by theme is
+   light-dark(light, dark), which follows the theme brand.css sets. */
+
+:root {
+  --mark: light-dark(#fde7d4, #4a2a10);
+  --mark-ink: light-dark(#3d2410, #fbe3cf);
+  --line: light-dark(#767676, #8a8a8a);
+}
+
+.options {
+  display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end;
+  margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--hair); border-radius: 3px;
+}
+.options legend { padding: 0 4px; color: var(--muted); }
+.options label { display: flex; flex-direction: column; gap: 2px; }
+.options .check { flex-direction: row; align-items: center; gap: 8px; min-height: 44px; }
+
+select, textarea, input[type="checkbox"] { font: inherit; color: var(--ink); background: var(--bg); }
+select { min-height: 44px; padding: 0 8px; border: 1px solid var(--line); border-radius: 3px; }
+input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--link); }
+
+.files { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.files label { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.files > div { min-width: 0; }
+textarea {
+  width: 100%; resize: vertical; padding: 6px 8px;
+  font-family: var(--mono); font-size: 13px;
+  border: 1px solid var(--line); border-radius: 3px;
+}
+
+.summary { margin: 16px 0 8px; font-weight: 700; }
+
+.view { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 24rem; overflow-y: auto; margin: 0 0 16px; }
+mark { background: var(--mark); color: var(--mark-ink); border-radius: 2px; outline: 1px solid var(--link); }
+mark.gap { padding: 0 1px; }
+.n {
+  display: inline-block; min-width: 1.4em; margin-right: 3px; padding: 0 3px;
+  font-size: 11px; text-align: center; color: var(--bg); background: var(--link); border-radius: 2px;
+}
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.table { overflow: auto; max-height: 24rem; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+caption { text-align: left; color: var(--muted); padding-bottom: 6px; }
+th, td { text-align: left; vertical-align: top; padding: 4px 8px; border-bottom: 1px solid var(--hair); }
+td code { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+@media (max-width: 640px) { .files { grid-template-columns: 1fr; } }

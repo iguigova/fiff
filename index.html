@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fiff: a fast text diff</title>
+<meta name="description" content="FIFF compares two texts a chunk at a time and, where they differ, token by token, ending each difference at the first token both sides share. Try it live.">
+<link rel="stylesheet" href="../brand.css">
+<link rel="stylesheet" href="demo/index.css">
+<script src="../brand.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>fiff</h1>
+      <p class="tag">A text diff that reads only as far as it must.</p>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>What it is</h2>
+      <div>
+        <p>FIFF compares two text files and lists where they differ. I wrote
+          it in C# for Code Project's Code Lean and Mean competition, where
+          the goal was a diff that is fast and small on large files with few
+          changes.</p>
+        <p>This is its JavaScript port, running in your browser. It fixes
+          four bugs the original has, and keeps its one deliberate
+          trade-off.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>How it works</h2>
+      <div>
+        <ol>
+          <li>Read both files a chunk at a time. While the chunks match,
+            there is nothing to do.</li>
+          <li>At the first chunk that differs, read it again as tokens. A
+            token ends at the delimiter you choose, a space or a line end,
+            and always at a line end.</li>
+          <li>Walk both token lists side by side. When the two current tokens
+            differ, look for each one among the other side's tokens read so
+            far. The nearer match ends the difference.</li>
+          <li>Report what came before the match on each side, ignoring case,
+            then go back to reading chunks.</li>
+        </ol>
+        <p>Unordered mode reads every token and asks only whether the other
+          file has it, anywhere. Each token cancels one copy on the other
+          side, so the same words in another order are no difference, and a
+          repeated word still counts.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Try it</h2>
+      <div>
+        <form id="demo" class="demo">
+          <fieldset class="options">
+            <legend>Options</legend>
+            <label>Example
+              <select id="example">
+                <option value="moved">A word moved</option>
+                <option value="unordered">The same words, unordered</option>
+                <option value="sister">Words added</option>
+                <option value="grid">The competition test</option>
+              </select>
+            </label>
+            <label>Tokens end at
+              <select id="delimiter">
+                <option value="32">a space</option>
+                <option value="10">a line end</option>
+              </select>
+            </label>
+            <label class="check"><input type="checkbox" id="ordered" checked> Ordered</label>
+          </fieldset>
+          <div class="files">
+            <label>File 1 <textarea id="text1" rows="5" spellcheck="false"></textarea></label>
+            <label>File 2 <textarea id="text2" rows="5" spellcheck="false"></textarea></label>
+          </div>
+        </form>
+
+        <p id="summary" class="summary" aria-live="polite"></p>
+
+        <div class="files" aria-label="The files with their differences marked">
+          <div>
+            <h3>File 1</h3>
+            <pre id="view1" class="view" tabindex="0" aria-label="File 1, differences marked"></pre>
+          </div>
+          <div>
+            <h3>File 2</h3>
+            <pre id="view2" class="view" tabindex="0" aria-label="File 2, differences marked"></pre>
+          </div>
+        </div>
+
+        <div class="table" tabindex="0" role="region" aria-labelledby="diffs-caption">
+          <table>
+            <caption id="diffs-caption">Each difference, as FIFF reports it: where it starts in each file, in bytes, and its text</caption>
+            <thead>
+              <tr><th scope="col">#</th><th scope="col">File 1 at</th><th scope="col">File 1 text</th><th scope="col">File 2 at</th><th scope="col">File 2 text</th></tr>
+            </thead>
+            <tbody id="diffs"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>What it trades</h2>
+      <div>
+        <p>A difference ends at the first token both sides share. That is
+          what keeps FIFF quick when changes are few: it never looks past
+          the end of a difference. But a line that repeats through a file,
+          like <code>&lt;TR vAlign=top&gt;</code>, can end a difference too
+          early and split one change into two.</p>
+        <p>The smallest diff, by longest common subsequence, never does
+          that, and costs time in the product of the two lengths. Pick
+          <em>The competition test</em> above: FIFF's differences hold 25
+          lines where the smallest diff holds 19. The original's
+          <a href="original/doc/FIFF.html">article</a> names this case
+          itself.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>The code</h2>
+      <div>
+        <p><code>src/fiff.js</code> is the port, with no dependencies.
+          The demo above judges each answer with the checks the tests use:
+          that it lists as many differences as it counts, that each sits in
+          its file where it says, and, ordered, that taking them out leaves
+          the same text on both sides, or, unordered, that each side holds
+          exactly the tokens the other lacks. The
+          <a href="https://github.com/iguigova/fiff#readme">README</a> traces
+          each of the original's bugs to its line and says how the port
+          fixes it.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="line"><a href="/">Ilka Guigova</a> · <a href="https://github.com/iguigova/fiff">github.com/iguigova/fiff</a> · MIT</div>
+    <div class="band" aria-hidden="true"></div>
+  </footer>
+</div>
+<script type="module" src="demo/index.js"></script>
+</body>
+</html>

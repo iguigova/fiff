@@ -11,6 +11,11 @@ against a reference diff.
   in `check/cases.js`, writing `record/csharp/<case>.out`.
 - `src/fiff.js` is the JS port, for Node and the browser, with no
   dependencies; `src/cli.js` takes FIFFConsole's arguments.
+- `index.html` and `demo/` are the page at https://iguigova.github.io/fiff/:
+  it runs the port in the browser on the original's test files or any text,
+  marks each difference in both files and judges the answer with
+  `check/check.js`. It loads `../brand.css` and `../brand.js` from the site
+  root.
 - `check/` judges a result. A correct answer counts as many differences as
   it lists, and each sits in its file where it says; in ordered mode,
   removing them leaves the same text in both files; in unordered mode, each
