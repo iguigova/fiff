@@ -6,7 +6,9 @@ against a reference diff.
 
 - `original/` is FIFFConsole 0.2 in C#, unchanged, from the `FIFFConsole`
   branch of `snippets_cs` at `e9d8cb1`: its source, documentation and test
-  files.
+  files. Its CodeProject article, which `original/README` links, is gone
+  from codeproject.com; the Wayback Machine holds it as of 2012-01-10:
+  http://web.archive.org/web/20120110151009/http://www.codeproject.com:80/KB/recipes/FIFF.aspx
 - `csharp/record.sh` builds it on .NET 8 in Docker and runs it on every case
   in `check/cases.js`, writing `record/csharp/<case>.out`.
 - `src/fiff.js` is the JS port, for Node and the browser, with no
